@@ -1,6 +1,8 @@
+const { Track } = require('../models/models');
+const ApiError = require('../error/ApiError');
 class TrackController {
   async create(req, res) {
-
+    
   }
 
   async getAll(req, res) {
@@ -8,6 +10,10 @@ class TrackController {
   }
 
   async getOne(req, res) {
+
+  }
+
+  async delete(req, res) {
 
   }
 }

@@ -1,6 +1,9 @@
-class LicenseController {
-  async create(req, res) {
+const { Licence } = require('../models/models');
+const ApiError = require('../error/ApiError');
 
+class LicenseController {
+  async update(req, res) {
+    
   }
 
   async getAll(req, res) {
