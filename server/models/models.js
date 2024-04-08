@@ -26,9 +26,9 @@ const BasketTrackLicense = sequelize.define('basket_track_license', {
 const Track = sequelize.define('track', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   name: { type: DataTypes.STRING, allowNull: false },
-  bpm: { type: DataTypes.INTEGER },
+  bpm: { type: DataTypes.INTEGER, allowNull: false },
   tonality: { type: DataTypes.STRING },
-  genre: { type: DataTypes.STRING },
+  genre: { type: DataTypes.STRING, allowNull: false },
   mood: { type: DataTypes.STRING },
   description: { type: DataTypes.STRING },
   icon: { type: DataTypes.STRING },
@@ -54,6 +54,7 @@ const License = sequelize.define('license', {
   count_copies: { type: DataTypes.INTEGER, defaultValue: 5000 },
   count_video_streams: { type: DataTypes.INTEGER, defaultValue: 10000 },
   count_performances: { type: DataTypes.INTEGER, defaultValue: 5 },
+  is_visible: { type: DataTypes.BOOLEAN, defaultValue: true, allowNull: false }
 });
 
 const AvailableFile = sequelize.define('available_file', {
@@ -64,7 +65,7 @@ const AvailableFile = sequelize.define('available_file', {
 const TrackLicense = sequelize.define('track_license', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   custom_price: { type: DataTypes.INTEGER, defaultValue: 2000 },
-  is_visible: { type: DataTypes.BOOLEAN, allowNull: false },
+  is_visible: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true, },
 });
 
 const PurchaseItem = sequelize.define('purchase_item', {
