@@ -6,12 +6,12 @@ const { Op } = require('sequelize')
 class TrackController {
   async create(req, res, next) {
     try {
-      const { userId, name, bpm, tonality, genre, mood, description } = req.body;
+      const { name, bpm, tonality, genre, mood, description } = req.body;
       const { icon } = req.files;
       let iconName = uuid.v4() + '.jpeg';
       icon.mv(path.resolve(__dirname, '..', 'static', iconName));
   
-      const track = await Track.create({ userId, name, bpm, tonality, genre, mood, description, icon: iconName });
+      const track = await Track.create({ userId: req.user.id, name, bpm, tonality, genre, mood, description, icon: iconName });
 
       return res.json(track);
     } catch (e) {

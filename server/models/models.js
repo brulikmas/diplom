@@ -49,11 +49,11 @@ const License = sequelize.define('license', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   type: { type: DataTypes.STRING, allowNull: false },
   name: { type: DataTypes.STRING, allowNull: false },
-  price: { type: DataTypes.INTEGER, defaultValue: 1000 },
-  count_streams: { type: DataTypes.INTEGER, defaultValue: 50000 },
-  count_copies: { type: DataTypes.INTEGER, defaultValue: 5000 },
-  count_video_streams: { type: DataTypes.INTEGER, defaultValue: 10000 },
-  count_performances: { type: DataTypes.INTEGER, defaultValue: 5 },
+  price: { type: DataTypes.INTEGER, defaultValue: 1000, allowNull: false },
+  count_streams: { type: DataTypes.INTEGER, defaultValue: 50000, allowNull: false },
+  count_copies: { type: DataTypes.INTEGER, defaultValue: 5000, allowNull: false },
+  count_video_streams: { type: DataTypes.INTEGER, defaultValue: 10000, allowNull: false },
+  count_performances: { type: DataTypes.INTEGER, defaultValue: 5, allowNull: false },
   is_visible: { type: DataTypes.BOOLEAN, defaultValue: true, allowNull: false }
 });
 
@@ -96,7 +96,7 @@ File.belongsTo(Track);
 Track.hasMany(TrackLicense);
 TrackLicense.belongsTo(Track);
 
-License.hasMany(AvailableFile);
+License.hasMany(AvailableFile, { as: 'availableFiles' });
 AvailableFile.belongsTo(License);
 
 License.hasMany(TrackLicense);
