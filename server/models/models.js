@@ -99,7 +99,7 @@ TrackLicense.belongsTo(Track);
 License.hasMany(AvailableFile, { as: 'availableFiles' });
 AvailableFile.belongsTo(License);
 
-License.hasMany(TrackLicense);
+License.hasMany(TrackLicense, { as: 'trackLicenses' });
 TrackLicense.belongsTo(License);
 
 Basket.hasMany(BasketTrackLicense);

@@ -37,13 +37,13 @@ class UserController {
       const condidateEmail = await User.findOne({ where: { email }});
   
       if (condidateEmail) {
-        return next(ApiError.badRequest('Пользователь с таким email уже существует'));
+        return next(ApiError.badRequest('Пользователь с таким email уже существует.'));
       }
 
       const condidateNickname = await User.findOne({ where: { nickname }});
   
       if (condidateNickname) {
-        return next(ApiError.badRequest('Пользователь с таким никнеймом уже существует'));
+        return next(ApiError.badRequest('Пользователь с таким никнеймом уже существует.'));
       }
   
       const hashPassword = await bcrypt.hash(password, 5);
