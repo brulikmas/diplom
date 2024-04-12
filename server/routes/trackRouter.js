@@ -6,6 +6,6 @@ const checkRole = require('../middleware/checkRoleMiddleware');
 router.post('/', checkRole('BEATMAKER'), trackController.create);
 router.get('/', trackController.getAll);
 router.get('/:id', trackController.getOne);
-router.delete('/:id', trackController.delete);
+router.delete('/:id',  checkRole('BEATMAKER'), trackController.delete);
 
 module.exports = router;

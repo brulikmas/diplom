@@ -1,6 +1,7 @@
 const ApiError = require('../error/ApiError');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 const { User, Basket, License, AvailableFile } = require('../models/models');
 const fileTypes = ['mp3', 'wav', 'trackout'];
 const licenses = [
@@ -31,7 +32,7 @@ class UserController {
       const { email, password, nickname, role } = req.body;
       
       if (!email || !password) {
-        return next(ApiError.badRequest('Некорректный email или пароль'));
+        return next(ApiError.badRequest('Некорректный email или пароль.'));
       }
   
       const condidateEmail = await User.findOne({ where: { email }});
@@ -67,7 +68,7 @@ class UserController {
       }
   
       const token = generateJwt(user.id, user.email, user.nickname, user.role);
-  
+      fs.mkdirSync(process.env.FILE_PATH + `\\${user.id}`);
       return res.json({token});
     } catch (e) {
       next(ApiError.badRequest(e.message));

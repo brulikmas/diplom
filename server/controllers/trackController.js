@@ -1,17 +1,65 @@
 const uuid = require('uuid');
 const path = require('path');
-const { Track } = require('../models/models');
+const { Track, File, TrackLicense } = require('../models/models');
 const ApiError = require('../error/ApiError');
-const { Op } = require('sequelize')
+const fs = require('fs');
+const { Op } = require('sequelize');
 class TrackController {
   async create(req, res, next) {
     try {
-      const { name, bpm, tonality, genre, mood, description } = req.body;
-      const { icon } = req.files;
+      let { name, bpm, tonality, genre, mood, description, trackLicenses } = req.body;
+      const { icon, mp3tag, mp3, wav, trackout } = req.files;
+      const files = [
+        {
+          type: 'mp3',
+          file: mp3,
+        },
+        {
+          type: 'wav',
+          file: wav,
+        },
+        {
+          type: 'trackout',
+          file: trackout
+        }
+      ];
       let iconName = uuid.v4() + '.jpeg';
-      icon.mv(path.resolve(__dirname, '..', 'static', iconName));
-  
-      const track = await Track.create({ userId: req.user.id, name, bpm, tonality, genre, mood, description, icon: iconName });
+      let mp3tagName = uuid.v4() + '.mp3';
+      icon?.mv(path.resolve(__dirname, '..', 'static', iconName));
+      mp3tag.mv(path.resolve(__dirname, '..', 'static', mp3tagName));
+
+      const track = await Track.create({ 
+        userId: req.user.id, 
+        name, 
+        bpm, 
+        tonality, 
+        genre, 
+        mood, 
+        description, 
+        icon: iconName,
+        mp3tag: mp3tagName,
+      });
+
+      if (trackLicenses) {
+        trackLicenses = JSON.parse(trackLicenses);
+        trackLicenses.forEach(tl => {
+          TrackLicense.create({
+            licenseId: tl.licenseId,
+            trackId: track.id,
+            custom_price: tl.custom_price,
+          })
+        });
+      }
+
+      let dirPath = process.env.FILE_PATH + `\\${req.user.id}\\${track.id}`
+      fs.mkdirSync(dirPath);
+
+      files.forEach(v => {
+        let path = dirPath + `\\${v.file.name}`;
+        v.file?.mv(path);
+        File.create({ trackId: track.id, type: v.type, path })
+      });
+
 
       return res.json(track);
     } catch (e) {

@@ -32,6 +32,7 @@ const Track = sequelize.define('track', {
   mood: { type: DataTypes.STRING },
   description: { type: DataTypes.STRING },
   icon: { type: DataTypes.STRING },
+  mp3tag: { type: DataTypes.STRING, allowNull: false },
   rating: { type: DataTypes.INTEGER, defaultValue: 0 },
 });
 
@@ -90,10 +91,10 @@ License.belongsTo(User);
 Track.hasMany(Rating);
 Rating.belongsTo(Track);
 
-Track.hasMany(File);
+Track.hasMany(File, { as: 'files' });
 File.belongsTo(Track);
 
-Track.hasMany(TrackLicense);
+Track.hasMany(TrackLicense, { as: 'trackLicenses' });
 TrackLicense.belongsTo(Track);
 
 License.hasMany(AvailableFile, { as: 'availableFiles' });
