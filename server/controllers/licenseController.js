@@ -1,4 +1,4 @@
-const { License, AvailableFile, TrackLicense } = require('../models/models');
+const { License, AvailableFile, TrackLicense, PurchaseItem } = require('../models/models');
 const ApiError = require('../error/ApiError');
 class LicenseController {
   async update(req, res, next) {
@@ -19,12 +19,51 @@ class LicenseController {
       const currentLicense = await License.findOne({
         where: { id },
         include: [
-          { model: TrackLicense, as: "trackLicenses" },
+          { 
+            model: TrackLicense, as: "trackLicenses", 
+            include: [{ model: PurchaseItem, as: 'purchaseItems' }],
+          },
           { model: AvailableFile, as: "availableFiles"},
         ],
       });
+      
+      let hasPurchaseItems = false;
+
+      if (currentLicense.trackLicenses.length !== 0) {
+        hasPurchaseItems = !!currentLicense.trackLicenses.find(tl => tl.purchaseItems.length !== 0);
+      }
+
+      if (hasPurchaseItems) {
+        License.update({ is_visible: false }, { where: { id } });
   
-      if (currentLicense.trackLicenses.length === 0) {
+        newLicense = await License.create(
+          {
+            userId: req.user.id,
+            type,
+            name, 
+            price,
+            count_streams,
+            count_copies,
+            count_video_streams,
+            count_performances,
+          },
+        );
+
+        currentLicense.trackLicenses.forEach(trackLicense => {
+          if (trackLicense.purchaseItems.length !== 0 && trackLicense.is_visible === true) {
+            TrackLicense.update({ is_visible: false }, { where: { id: trackLicense.id } });
+            TrackLicense.create({
+              licenseId: newLicense.id, 
+              trackId: trackLicense.trackId, 
+              custom_price: trackLicense.custom_price,
+            });
+          }
+        }); 
+
+        availableFiles.forEach(v => {
+          AvailableFile.create({ licenseId: newLicense.id, file_type: v.file_type });
+        });
+      } else {
         newLicense = await License.update(
           {
             name,
@@ -38,7 +77,7 @@ class LicenseController {
             where: { id }
           }
         );
-        
+
         if (availableFiles.length >= currentLicense.availableFiles.length) {
           availableFiles.forEach(v => {
             if (!currentLicense.availableFiles.find(af => af.file_type === v.file_type)) {
@@ -54,36 +93,6 @@ class LicenseController {
         }
 
         newLicense = await License.findOne({ where: { id } });
-      } else {
-        License.update({ is_visible: false }, { where: { id } });
-  
-        newLicense = await License.create(
-          {
-            userId: req.user.id,
-            type,
-            name, 
-            price,
-            count_streams,
-            count_copies,
-            count_video_streams,
-            count_performances,
-          },
-        );
-  
-        currentLicense.trackLicenses.forEach(trackLicense => {
-          TrackLicense.update({ is_visible: false }, { where: { id: trackLicense.id } });
-          //Возможно, в будущем сделать обработку на то, имеется ли покупка для данной трек-лицензии,
-          //чтобы не создавать множество лишних записей.
-          TrackLicense.create({ 
-            licenseId: newLicense.id, 
-            trackId: trackLicense.trackId, 
-            custom_price: trackLicense.custom_price,
-          })
-        });
-  
-        availableFiles.forEach(v => {
-          AvailableFile.create({ licenseId: newLicense.id, file_type: v.file_type });
-        });
       }
   
       return res.json(newLicense);

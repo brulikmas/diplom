@@ -34,6 +34,7 @@ const Track = sequelize.define('track', {
   icon: { type: DataTypes.STRING },
   mp3tag: { type: DataTypes.STRING, allowNull: false },
   rating: { type: DataTypes.INTEGER, defaultValue: 0 },
+  is_visible: { type: DataTypes.BOOLEAN, defaultValue: true },
 });
 
 const Rating = sequelize.define('rating', {
@@ -109,7 +110,7 @@ BasketTrackLicense.belongsTo(Basket);
 TrackLicense.hasMany(BasketTrackLicense);
 BasketTrackLicense.belongsTo(TrackLicense);
 
-TrackLicense.hasMany(PurchaseItem);
+TrackLicense.hasMany(PurchaseItem, { as: 'purchaseItems' });
 PurchaseItem.belongsTo(TrackLicense);
 
 module.exports = {

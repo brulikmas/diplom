@@ -4,8 +4,10 @@ const router = new Router();
 const checkRole = require('../middleware/checkRoleMiddleware');
 
 router.post('/', checkRole('BEATMAKER'), trackController.create);
+router.put('/', checkRole('BEATMAKER'), trackController.update);
 router.get('/', trackController.getAll);
 router.get('/:id', trackController.getOne);
-router.delete('/:id',  checkRole('BEATMAKER'), trackController.delete);
+router.get('/withAuth/:id', checkRole('BEATMAKER'),  trackController.getOneWithAuth);
+router.delete('/',  checkRole('BEATMAKER'), trackController.delete);
 
 module.exports = router;
