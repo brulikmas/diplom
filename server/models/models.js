@@ -104,10 +104,10 @@ AvailableFile.belongsTo(License);
 License.hasMany(TrackLicense, { as: 'trackLicenses' });
 TrackLicense.belongsTo(License);
 
-Basket.hasMany(BasketTrackLicense);
+Basket.hasMany(BasketTrackLicense, { as: 'basketTrackLicenses' });
 BasketTrackLicense.belongsTo(Basket);
 
-TrackLicense.hasMany(BasketTrackLicense);
+TrackLicense.hasMany(BasketTrackLicense, { as: 'basketTrackLicenses' });
 BasketTrackLicense.belongsTo(TrackLicense);
 
 TrackLicense.hasMany(PurchaseItem, { as: 'purchaseItems' });

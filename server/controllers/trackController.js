@@ -111,7 +111,7 @@ class TrackController {
             as: "trackLicenses",
             where: { is_visible: true },
           }],
-          distinct:true
+          distinct: true
         });
       }
   
