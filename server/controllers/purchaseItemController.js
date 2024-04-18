@@ -48,11 +48,8 @@ class PurchaseItemController {
           }
         });
         
-        let writableTrack = {...track};
+        let writableTrack = JSON.parse(JSON.stringify(track));
         writableTrack.files = availableFilesInTrack;
-
-        console.log(writableTrack)
-
 
         newPurchaseItems.rows.push({
           id: purchaseItem.id,

@@ -2,6 +2,8 @@ const ApiError = require('../error/ApiError');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
+const uuid = require('uuid');
+const path = require('path');
 const { User, Basket, License, AvailableFile } = require('../models/models');
 const fileTypes = ['mp3', 'wav', 'trackout'];
 const licenses = [
@@ -102,6 +104,60 @@ class UserController {
   async check(req, res, next) {
     const token = generateJwt(req.user.id, req.user.email, req.user.nickname, req.user.role);
     return res.json({ token });
+  }
+
+  async getOne(req, res, next) {
+    try {
+      const { id } = req.params;
+      let user = await User.findOne({ where: { id } });
+      return res.json({
+        id: user.id,
+        nickname: user.nickname,
+        name: user.name,
+        surname: user.surname,
+        country: user.country,
+        avatar: user.avatar,
+        info: user.info
+      })
+    } catch (e) {
+      next(ApiError.badRequest(e.message));
+    }
+  }
+
+  async getBalance(req, res, next) {
+    try {
+      let user = await User.findOne({ where: { id: req.user.id } });
+      return res.json({ balance: user.balance });
+    } catch (e) {
+      next(ApiError.badRequest(e.message));
+    }
+  }
+
+  async update(req, res, next) {
+    try {
+      const { name, surname, country, info, nickname } = req.body;
+      const { avatar } = req.files;
+      
+      let avatarName = uuid.v4() + '.jpeg';
+      avatar?.mv(path.resolve(__dirname, '..', 'static', avatarName));
+
+      const previousUser = await User.findOne({ where: { id: req.user.id } });
+      await User.update(
+        { 
+          name,
+          surname,
+          country,
+          info,
+          nickname,
+          avatar: avatar ? avatarName : previousUser.avatar,
+        },
+        { where: { id: req.user.id } }
+      )
+
+      return res.json('Информация о пользователе обновлена');
+    } catch (e) {
+      next(ApiError.badRequest(e.message));
+    }
   }
 }
 

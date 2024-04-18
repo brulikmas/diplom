@@ -1,6 +1,5 @@
 const { License, AvailableFile, TrackLicense, BasketTrackLicense, Basket, Track, User } = require('../models/models');
 const ApiError = require('../error/ApiError');
-const { where } = require('sequelize');
 
 class BasketTrackLicenseController {
   async create(req, res, next) {

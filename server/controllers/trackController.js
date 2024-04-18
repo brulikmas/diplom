@@ -1,6 +1,6 @@
 const uuid = require('uuid');
 const path = require('path');
-const { Track, File, TrackLicense, PurchaseItem } = require('../models/models');
+const { Track, File, TrackLicense, PurchaseItem, User, License, AvailableFile } = require('../models/models');
 const ApiError = require('../error/ApiError');
 const fs = require('fs');
 const { Op } = require('sequelize');
@@ -28,8 +28,11 @@ class TrackController {
       icon?.mv(path.resolve(__dirname, '..', 'static', iconName));
       mp3tag.mv(path.resolve(__dirname, '..', 'static', mp3tagName));
 
+      let user = await User.findOne({ where: { id: req.user.id } });
+
       const track = await Track.create({ 
-        userId: req.user.id, 
+        userId: req.user.id,
+        userNickname: user.nickname,
         name, 
         bpm, 
         tonality, 
@@ -125,7 +128,7 @@ class TrackController {
             as: "trackLicenses",
             where: { is_visible: true },
           }],
-          distinct:true
+          distinct: true
         });
       }
   
@@ -179,7 +182,7 @@ class TrackController {
           { model: File, as: "files" },
         ],
       });
-
+      
       if (req.user.id === track.userId) {
         let hasPurchaseItems = false;
         let filesPath = process.env.FILE_PATH + `\\${req.user.id}\\${track.id}`;
@@ -272,7 +275,7 @@ class TrackController {
               TrackLicense.update( { is_visible: false }, { where: { id: tl.id } });
               TrackLicense.create({
                 licenseId: tl.licenseId,
-                trackId: tl.trackId,
+                trackId: id,
                 custom_price: tl.custom_price,
               });
             } else {
@@ -299,6 +302,43 @@ class TrackController {
       } else {
         next(ApiError.forbidden('Нет доступа.'));
       }
+    } catch (e) {
+      next(ApiError.badRequest(e.message));
+    }
+  }
+
+  async downloadFile(req, res, next) {
+    try {
+      const { purchaseId, filePath, fileType } = req.query;
+      const user = await User.findOne({ 
+        where: { id: req.user.id }, 
+        include: [{ model: PurchaseItem, as: 'purchaseItems'}]
+      });
+      console.log(purchaseId)
+      console.log(user)
+
+      if (user.purchaseItems.find(v => v.id == purchaseId)) {
+        const purchaseItem = await PurchaseItem.findOne({ where: { id: purchaseId }});
+        const trackLicense = await TrackLicense.findOne({ where: { id: purchaseItem.trackLicenseId }});
+        const license = await License.findOne({ 
+          where: { id: trackLicense.licenseId },
+          include: [{ model: AvailableFile, as: 'availableFiles' }],
+        });
+
+        if (!license.availableFiles.find(v => v.file_type === fileType)) {
+          next(ApiError.forbidden('Нет доступа к файлу'));
+          return;
+        }
+
+        if (fs.existsSync(filePath)) {
+          return res.download(filePath)
+        }
+
+        return res.status(400).json({ message: 'Download error'});
+      } else {
+        next(ApiError.forbidden('Нет доступа к файлу'));
+      }
+
     } catch (e) {
       next(ApiError.badRequest(e.message));
     }

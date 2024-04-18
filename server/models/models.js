@@ -25,6 +25,7 @@ const BasketTrackLicense = sequelize.define('basket_track_license', {
 
 const Track = sequelize.define('track', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  userNickname: { type: DataTypes.STRING, allowNull: false },
   name: { type: DataTypes.STRING, allowNull: false },
   bpm: { type: DataTypes.INTEGER, allowNull: false },
   tonality: { type: DataTypes.STRING },
@@ -83,7 +84,7 @@ Track.belongsTo(User);
 User.hasMany(Rating);
 Rating.belongsTo(User);
 
-User.hasMany(PurchaseItem);
+User.hasMany(PurchaseItem, { as: 'purchaseItems' });
 PurchaseItem.belongsTo(User);
 
 User.hasMany(License);

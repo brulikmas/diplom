@@ -57,6 +57,8 @@ class LicenseController {
               trackId: trackLicense.trackId, 
               custom_price: trackLicense.custom_price,
             });
+          } else if (trackLicense.purchaseItems.length === 0 && trackLicense.is_visible === true) {
+            TrackLicense.update({ licenseId: newLicense.id }, { where: { id: trackLicense.id } });
           }
         }); 
 
