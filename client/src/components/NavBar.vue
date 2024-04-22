@@ -49,7 +49,7 @@
   </v-app-bar>
 </template>
 <script>
-import { mapState } from 'pinia'
+import { mapState } from 'pinia';
 import { useUserStore } from '../store/userStore';
 
 export default {

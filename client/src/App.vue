@@ -4,13 +4,7 @@
       @updateDrawer="drawer = !drawer"
     ></nav-bar>
 
-    <v-navigation-drawer
-      v-model="drawer"
-    >
-      <v-list>
-        <v-list-item title="Navigation drawer"></v-list-item>
-      </v-list>
-    </v-navigation-drawer>
+    <nav-drawer :drawer="drawer"></nav-drawer>
 
     <v-main class="d-flex align-center justify-center" style="min-height: 300px;">
       <router-view></router-view>
@@ -19,10 +13,12 @@
 </template>
 <script>
 import NavBar from './components/NavBar.vue';
+import NavDrawer from './components/NavDrawer.vue';
 
 export default {
   components: {
     NavBar,
+    NavDrawer,
   },
   data() {
     return {
