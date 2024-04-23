@@ -5,14 +5,6 @@
     :loading="!audioDownloaded"
     v-bind="$attrs"
   >
-    <v-img
-      v-if="albumArt && compact"
-      :src="albumArt"
-      aspect-ratio="1"
-      contain
-      class="grey darken-3"
-    ></v-img>
-
     <audio
       ref="audio"
       @pause="playing = false"
@@ -22,6 +14,7 @@
       @canplaythrough="audioDownloaded = true"
       @ended="handleAudioEnd"
       @error="$emit('error', $event)"
+      type="audio/mpeg"
       :src="src"
     ></audio>
 
@@ -30,52 +23,54 @@
       v-if="src"
       min="0"
       max="1000000"
-      :value="parseInt((currentTime / duration) * 1000000) || 0"
-      @input="seek($event)"
+      :modelValue="parseInt((currentTime / duration) * 1000000) || 0"
+      @update:modelValue="seek($event)"
       @focus="seekerFocused = true"
       @blur="seekerFocused = false"
     ></v-slider>
 
     <v-card-text>
       <v-row
-        :class="compact ? 'text-center' : 'text-left'"
+        class="text-left"
         align="center"
         justify="center"
       >
-        <v-col :cols="compact ? 12 : 6" class="d-flex align-center">
-          <v-avatar tile class="d-inline-block" v-if="albumArt && !compact">
-            <v-img :src="albumArt" aspect-ratio="1"></v-img>
-          </v-avatar>
-
-          <div
-            class="mx-auto"
-            :class="albumArt && !compact && 'ml-3 d-inline-block'"
+        <v-col cols="1">
+          <v-img 
+            :width="100" 
+            :src="albumArt" 
+            aspect-ratio="1"
+            cover
           >
-            <span v-if="trackTitle" class="d-block" v-text="trackTitle"></span>
-            <span
-              v-text="trackSubtitle"
-              class="d-block text-uppercase font-weight-bold"
-              style="letter-spacing: 0.05em"
-            ></span>
-          </div>
+          </v-img>
+        </v-col>
+        <v-col cols="4">
+          <span v-if="trackTitle" class="d-block" v-text="trackTitle"></span>
+          <span
+            v-text="trackSubtitle"
+            class="d-block text-uppercase font-weight-bold"
+            style="letter-spacing: 0.05em"
+          ></span>
         </v-col>
 
         <v-spacer></v-spacer>
 
-        <v-col :cols="compact ? 12 : 2">
+        <v-col cols="2">
           <div
-            class="d-flex align-center mx-auto"
-            :class="compact ? 'justify-center' : 'justify-end'"
+            class="d-flex align-center mx-auto justify-end"
             style="max-width: 12rem"
           >
-            <v-btn icon @click="muted = !muted">
-              <v-icon v-text="volumeIcon"></v-icon>
+            <v-btn 
+              :icon="volumeIcon" 
+              @click="muted = !muted"
+              variant="text"
+            >
             </v-btn>
 
             <v-slider
               class="mt-2 volume-slider"
               :value="muted ? 0 : volume"
-              @input="setVolume"
+              @update:modelValue="setVolume"
               thumb-label
               max="100"
               min="0"
@@ -85,58 +80,50 @@
 
         <v-col
           v-if="src"
-          :cols="compact ? 12 : 4"
-          class="d-flex align-center"
-          :class="compact ? 'justify-center' : 'justify-end'"
+          :cols="4"
+          class="d-flex align-center justify-end"
         >
-          <div :class="compact ? 'mx-1' : 'mx-2'">
-            <v-btn
-              icon
-              :disabled="!audioDownloaded || !allowPrevious"
-              @click="$emit('previous-audio')"
-            >
-              <v-icon size="20">{{ prevTrackIcon }}</v-icon>
-            </v-btn>
-          </div>
+          <v-btn
+            class="mr-2"
+            size="x-small"
+            :icon="prevTrackIcon"
+            :disabled="!audioDownloaded || !allowPrevious"
+            @click="$emit('previous-audio')"
+          >
+          </v-btn>
 
-          <div :class="compact ? 'mx-1' : 'mx-2'">
-            <v-btn
-              icon
-              :disabled="!audioDownloaded"
-              @click="forwardSeconds(-5)"
-            >
-              <v-icon size="20">{{ backForwardIcon }}</v-icon>
-            </v-btn>
-          </div>
+          <v-btn
+            class="mr-2"
+            size="x-small"
+            :icon="backForwardIcon"
+            :disabled="!audioDownloaded"
+            @click="forwardSeconds(-5)"
+          ></v-btn>
 
-          <div :class="compact ? 'mx-2' : 'mx-3'">
-            <v-btn
-              icon
-              :disabled="!audioDownloaded"
-              @click="playing = !playing"
-            >
-              <v-icon
-                size="30"
-                v-text="playing ? pauseIcon : playIcon"
-              ></v-icon>
-            </v-btn>
-          </div>
+          <v-btn
+            class="mr-2"
+            size="x-small"
+            :icon="playing ? pauseIcon : playIcon"
+            :disabled="!audioDownloaded"
+            @click="playing = !playing"
+          >
+          </v-btn>
 
-          <div :class="compact ? 'mx-1' : 'mx-2'">
-            <v-btn icon :disabled="!audioDownloaded" @click="forwardSeconds(5)">
-              <v-icon size="20">{{ fastForwardIcon }}</v-icon>
-            </v-btn>
-          </div>
+          <v-btn
+            class="mr-2"
+            size="x-small"
+            :icon="fastForwardIcon"
+            :disabled="!audioDownloaded" 
+            @click="forwardSeconds(5)"
+          ></v-btn>
 
-          <div :class="compact ? 'mx-1' : 'mx-2'">
-            <v-btn
-              icon
-              :disabled="!audioDownloaded || !allowNext"
-              @click="$emit('next-audio')"
-            >
-              <v-icon size="20">{{ nextTrackIcon }}</v-icon>
-            </v-btn>
-          </div>
+          <v-btn
+            size="x-small"
+            :icon="nextTrackIcon"
+            :disabled="!audioDownloaded || !allowNext"
+            @click="$emit('next-audio')"
+          >
+          </v-btn>
         </v-col>
       </v-row>
     </v-card-text>
@@ -197,6 +184,7 @@ export default {
     },
     src(value) {
       if (value) {
+        console.log(1)
         this.audioDownloaded = false;
         this.playing = false;
       }
