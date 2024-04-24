@@ -10,6 +10,7 @@ export const useTrackStore = defineStore('trackStore', {
           name: 'Nice',
           rating: 0,
           icon: 'https://cdn.vuetifyjs.com/images/parallax/material.jpg',
+          mp3tag: 'http://localhost:5000/2e608974-90bd-414b-806f-cbe334d364a4.mp3',
           userId: 1,
           trackLicenses: [
             {
@@ -32,6 +33,7 @@ export const useTrackStore = defineStore('trackStore', {
           name: 'Okay',
           rating: 0,
           icon: 'https://cdn.vuetifyjs.com/images/parallax/material.jpg',
+          mp3tag: 'http://localhost:5000/2e608974-90bd-414b-806f-cbe334d364a4.mp3',
           userId: 1,
           trackLicenses: [
             {
@@ -54,6 +56,7 @@ export const useTrackStore = defineStore('trackStore', {
           name: 'Face',
           rating: 0,
           icon: 'https://cdn.vuetifyjs.com/images/parallax/material.jpg',
+          mp3tag: 'http://localhost:5000/2e608974-90bd-414b-806f-cbe334d364a4.mp3',
           userId: 2,
           trackLicenses: [
             {
@@ -76,6 +79,7 @@ export const useTrackStore = defineStore('trackStore', {
           name: 'Mamacita',
           rating: 3,
           icon: 'https://cdn.vuetifyjs.com/images/parallax/material.jpg',
+          mp3tag: 'http://localhost:5000/2e608974-90bd-414b-806f-cbe334d364a4.mp3',
           userId: 1,
           trackLicenses: [
             {
@@ -98,6 +102,7 @@ export const useTrackStore = defineStore('trackStore', {
           name: 'Flow',
           rating: 1,
           icon: 'https://cdn.vuetifyjs.com/images/parallax/material.jpg',
+          mp3tag: 'http://localhost:5000/2e608974-90bd-414b-806f-cbe334d364a4.mp3',
           userId: 1,
           trackLicenses: [
             {

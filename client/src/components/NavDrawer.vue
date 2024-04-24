@@ -54,6 +54,8 @@ export default {
   }
 }
 </script>
-<style>
-  
+<style scoped>
+.v-list-item:hover, .v-list-item--active {
+  color: orange;
+}
 </style>

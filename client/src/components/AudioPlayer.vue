@@ -1,6 +1,6 @@
 <template>
   <v-card
-    class="mt-5"
+    class="mt-0 audio_player"
     ref="playerContainer"
     :loading="!audioDownloaded"
     v-bind="$attrs"
@@ -19,17 +19,15 @@
     ></audio>
 
     <v-slider
-      class="audio-seeker"
       v-if="src"
+      :thumb-size="12"
       min="0"
       max="1000000"
       :modelValue="parseInt((currentTime / duration) * 1000000) || 0"
       @update:modelValue="seek($event)"
-      @focus="seekerFocused = true"
-      @blur="seekerFocused = false"
     ></v-slider>
 
-    <v-card-text>
+    <v-card-text class="pt-0">
       <v-row
         class="text-left"
         align="center"
@@ -37,7 +35,7 @@
       >
         <v-col cols="1">
           <v-img 
-            :width="100" 
+            :width="70" 
             :src="albumArt" 
             aspect-ratio="1"
             cover
@@ -45,48 +43,31 @@
           </v-img>
         </v-col>
         <v-col cols="4">
-          <span v-if="trackTitle" class="d-block" v-text="trackTitle"></span>
-          <span
-            v-text="trackSubtitle"
-            class="d-block text-uppercase font-weight-bold"
-            style="letter-spacing: 0.05em"
-          ></span>
-        </v-col>
-
-        <v-spacer></v-spacer>
-
-        <v-col cols="2">
-          <div
-            class="d-flex align-center mx-auto justify-end"
-            style="max-width: 12rem"
+          <router-link
+            class="d-block link"
+            :to="`/userProfile/${track.userId}`"
           >
-            <v-btn 
-              :icon="volumeIcon" 
-              @click="muted = !muted"
-              variant="text"
-            >
-            </v-btn>
+            {{ track.userNickname }}
+          </router-link>
 
-            <v-slider
-              class="mt-2 volume-slider"
-              :value="muted ? 0 : volume"
-              @update:modelValue="setVolume"
-              thumb-label
-              max="100"
-              min="0"
-            ></v-slider>
-          </div>
+          <router-link
+            class="d-block text-uppercase font-weight-bold link"
+            style="letter-spacing: 0.05em"
+            :to="`/trackItem/${track.id}`"
+          >
+            {{ track.name }}
+          </router-link>
         </v-col>
 
         <v-col
           v-if="src"
           :cols="4"
-          class="d-flex align-center justify-end"
+          class="d-flex align-center justify-senter"
         >
           <v-btn
             class="mr-2"
-            size="x-small"
-            :icon="prevTrackIcon"
+            size="small"
+            icon="mdi-skip-previous"
             :disabled="!audioDownloaded || !allowPrevious"
             @click="$emit('previous-audio')"
           >
@@ -94,16 +75,16 @@
 
           <v-btn
             class="mr-2"
-            size="x-small"
-            :icon="backForwardIcon"
+            size="small"
+            icon="mdi-rewind-5"
             :disabled="!audioDownloaded"
             @click="forwardSeconds(-5)"
           ></v-btn>
 
           <v-btn
             class="mr-2"
-            size="x-small"
-            :icon="playing ? pauseIcon : playIcon"
+            size="small"
+            :icon="playing ? 'mdi-pause' : 'mdi-play'"
             :disabled="!audioDownloaded"
             @click="playing = !playing"
           >
@@ -111,19 +92,33 @@
 
           <v-btn
             class="mr-2"
-            size="x-small"
-            :icon="fastForwardIcon"
+            size="small"
+            icon="mdi-fast-forward-5"
             :disabled="!audioDownloaded" 
             @click="forwardSeconds(5)"
           ></v-btn>
 
           <v-btn
-            size="x-small"
-            :icon="nextTrackIcon"
+            size="small"
+            icon="mdi-skip-next"
             :disabled="!audioDownloaded || !allowNext"
             @click="$emit('next-audio')"
           >
           </v-btn>
+        </v-col>
+
+        <v-col cols="3">
+          <v-slider
+            class="mt-2"
+            :prepend-icon="volumeIcon"
+            :model-value="muted ? 0 : volume"
+            thumb-label
+            :thumb-size="10"
+            max="100"
+            min="0"
+            @update:modelValue="setVolume"
+            @click:prepend="muted = !muted"
+          ></v-slider>
         </v-col>
       </v-row>
     </v-card-text>
@@ -132,26 +127,14 @@
 
 <script>
 export default {
+  emits: ['next-audio', 'previous-audio', 'changePlayingState'],
   props: {
     src: { type: String },
-    trackTitle: { type: String },
-    trackSubtitle: { type: String, default: undefined },
+    track: { type: Object, default: null },
     allowPrevious: { type: Boolean, default: false },
     allowNext: { type: Boolean, default: false },
-    compact: { type: Boolean, default: false },
-    albumArt: { type: String, default: undefined },
+    albumArt: { type: String, default: null },
     autoplay: { type: Boolean, default: false },
-    // icons
-    prevTrackIcon: { type: String, default: "mdi-skip-previous" },
-    nextTrackIcon: { type: String, default: "mdi-skip-next" },
-    backForwardIcon: { type: String, default: "mdi-rewind-5" },
-    fastForwardIcon: { type: String, default: "mdi-fast-forward-5" },
-    playIcon: { type: String, default: "mdi-play" },
-    pauseIcon: { type: String, default: "mdi-pause" },
-    muteVolumeIcon: { type: String, default: "mdi-volume-off" },
-    lowVolumeIcon: { type: String, default: "mdi-volume-low" },
-    mediumVolumeIcon: { type: String, default: "mdi-volume-medium" },
-    highVolumeIcon: { type: String, default: "mdi-volume-high" },
   },
   data() {
     return {
@@ -159,7 +142,7 @@ export default {
       currentTime: 0,
       duration: 0,
       playing: false,
-      volume: 20,
+      volume: 40,
       seekerFocused: false,
       keydownListener: null,
       muted: false,
@@ -184,7 +167,6 @@ export default {
     },
     src(value) {
       if (value) {
-        console.log(1)
         this.audioDownloaded = false;
         this.playing = false;
       }
@@ -196,13 +178,13 @@ export default {
   computed: {
     volumeIcon() {
       if (this.muted) {
-        return this.muteVolumeIcon;
+        return 'mdi-volume-off';
       } else if (this.volume === 0) {
-        return this.lowVolumeIcon;
+        return 'mdi-volume-low';
       } else if (this.volume >= 50) {
-        return this.highVolumeIcon;
+        return 'mdi-volume-high';
       } else {
-        return this.mediumVolumeIcon;
+        return 'mdi-volume-medium';
       }
     },
   },
@@ -226,7 +208,7 @@ export default {
       this.duration = this.$refs.audio.duration;
     },
     handleTimeUpdate() {
-      this.currentTime = this.$refs.audio.currentTime;
+      this.currentTime = this.$refs.audio?.currentTime;
     },
     handleAudioEnd() {
       if (this.allowNext) {
@@ -241,66 +223,19 @@ export default {
   mounted() {
     this.$refs.audio.volume = this.volume / 100;
     this.muted = this.$refs.audio.muted;
-
-    this.keydownListener = document.addEventListener("keydown", (event) => {
-      if (event.keyCode === 32 && this.seekerFocused) {
-        event.preventDefault();
-        this.playing = !this.playing;
-      }
-    });
-  },
-  beforeDestroy() {
-    document.removeEventListener("keydown", this.keydownListener);
   },
 };
 </script>
 
-<style lang="scss">
-.volume-slider .v-messages {
-  display: none;
+<style lang="scss" scoped>
+:deep(.v-input__details) {
+  display: none !important;
 }
-
-.audio-seeker {
-  .v-slider {
-    min-height: 0;
-  }
-
-  .v-slider--horizontal {
-    margin-left: 0;
-    margin-right: 0;
-  }
-
-  .v-slider__track-background {
-    width: 100% !important;
-  }
-
-  .v-messages {
-    display: none;
-  }
-
-  .v-slider__thumb:before {
-    opacity: 0;
-  }
-
-  .v-slider__thumb {
-    height: 10px;
-    width: 10px;
-    cursor: pointer;
-  }
-
-  .v-slider__track-container {
-    cursor: pointer;
-    height: 6px !important;
-  }
-
-  .v-slider__track-fill,
-  .v-slider__track-background,
-  .v-slider__track-container {
-    border-radius: 9999px;
-  }
-
-  * {
-    transition: none !important;
-  }
+.link {
+  text-decoration: none;
+  color: inherit;
+}
+.link:hover {
+  text-decoration: underline;
 }
 </style>

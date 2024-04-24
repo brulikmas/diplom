@@ -1,6 +1,15 @@
 <template>
-  <v-list-item class="track_item" rounded="lg">
+  <v-list-item class="track_item mb-4" rounded="lg">
     <template #prepend>
+      <v-btn
+        class="mr-2"
+        size="small"
+        icon="mdi-play"
+        color="orange"
+        variant="text"
+        @click="play(track)"
+      ></v-btn>
+
       <v-list-item-media class="mr-4">
         <v-img
           :width="50"
@@ -13,11 +22,21 @@
     </template>
 
     <v-list-item-title class="mb-2">
-      <router-link>{{ track.name }}</router-link>
+      <router-link 
+        :to="`/trackItem/${track.id}`"
+        class="link"
+      >
+        {{ track.name }}
+      </router-link>
     </v-list-item-title>
 
     <v-list-item-subtitle>
-      <router-link>{{ track.userNickname}}</router-link>
+      <router-link 
+        :to="`/userProfile/${track.userId}`"
+        class="link"
+      >
+        {{ track.userNickname }}
+      </router-link>
     </v-list-item-subtitle>
 
     <template #append>
@@ -41,6 +60,9 @@
   </v-list-item>
 </template>
 <script>
+import { mapActions } from 'pinia'
+import { useAudioPlayerStore } from '../store/audioPlayerStore';
+
 export default {
   props: {
     track: {
@@ -61,12 +83,22 @@ export default {
 
       return lowestPrice;
     }
+  },
+  methods: {
+    ...mapActions(useAudioPlayerStore, ['play']),
   }
 }
 </script>
-<style>
+<style scoped>
 .track_item:hover {
   cursor: pointer;
   background: rgb(55, 46, 35);
+}
+.link {
+  text-decoration: none;
+  color: inherit;
+}
+.link:hover {
+  text-decoration: underline;
 }
 </style>
