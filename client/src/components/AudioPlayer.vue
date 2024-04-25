@@ -1,14 +1,13 @@
 <template>
   <v-card
-    class="mt-0 audio_player"
+    class="mt-0"
+    height="115"
     ref="playerContainer"
     :loading="!audioDownloaded"
     v-bind="$attrs"
   >
     <audio
       ref="audio"
-      @pause="playing = false"
-      @play="playing = true"
       @timeupdate="handleTimeUpdate"
       @durationchange="setDuration"
       @canplaythrough="audioDownloaded = true"
@@ -43,20 +42,24 @@
           </v-img>
         </v-col>
         <v-col cols="4">
-          <router-link
-            class="d-block link"
-            :to="`/userProfile/${track.userId}`"
-          >
-            {{ track.userNickname }}
-          </router-link>
+          <div>
+            <router-link
+              :to="`/userProfile/${track.userId}`"
+              class="link"
+            >
+              {{ track.userNickname }}
+            </router-link>
+          </div>
 
-          <router-link
-            class="d-block text-uppercase font-weight-bold link"
-            style="letter-spacing: 0.05em"
-            :to="`/trackItem/${track.id}`"
-          >
-            {{ track.name }}
-          </router-link>
+          <div>
+            <router-link
+              class="text-uppercase font-weight-bold link"
+              style="letter-spacing: 0.05em"
+              :to="`/trackItem/${track.id}`"
+            >
+              {{ track.name }}
+            </router-link>
+          </div>
         </v-col>
 
         <v-col
@@ -86,7 +89,7 @@
             size="small"
             :icon="playing ? 'mdi-pause' : 'mdi-play'"
             :disabled="!audioDownloaded"
-            @click="playing = !playing"
+            @click="$emit('changePlayingState', !playing)"
           >
           </v-btn>
 
@@ -107,9 +110,9 @@
           </v-btn>
         </v-col>
 
-        <v-col cols="3">
+        <v-col class="d-flex align-center" cols="3">
+          <p>{{ getDuration }}</p>
           <v-slider
-            class="mt-2"
             :prepend-icon="volumeIcon"
             :model-value="muted ? 0 : volume"
             thumb-label
@@ -135,13 +138,13 @@ export default {
     allowNext: { type: Boolean, default: false },
     albumArt: { type: String, default: null },
     autoplay: { type: Boolean, default: false },
+    playing: { type: Boolean, default: false },
   },
   data() {
     return {
       audioDownloaded: false,
       currentTime: 0,
       duration: 0,
-      playing: false,
       volume: 40,
       seekerFocused: false,
       keydownListener: null,
@@ -149,11 +152,16 @@ export default {
     };
   },
   watch: {
-    playing(value) {
-      if (value) {
-        return this.$refs.audio.play();
-      }
-      this.$refs.audio.pause();
+    playing: {
+      handler(value) {
+        this.$nextTick(() => {
+          if (value) {
+            return this.$refs.audio.play();
+          }
+          this.$refs.audio.pause();
+        });
+      },
+      immediate: true,
     },
     muted(value) {
       this.$refs.audio.muted = value;
@@ -161,14 +169,14 @@ export default {
     audioDownloaded(value) {
       if (this.autoplay) {
         if (value) {
-          this.playing = true;
+          this.$emit('changePlayingState', true);
         }
       }
     },
     src(value) {
       if (value) {
         this.audioDownloaded = false;
-        this.playing = false;
+        this.$emit('changePlayingState', false);
       }
     },
     volume() {
@@ -187,8 +195,18 @@ export default {
         return 'mdi-volume-medium';
       }
     },
+    getDuration() {
+      return `${this.secondsToMinutesAndSeconds(this.currentTime)} / ${this.secondsToMinutesAndSeconds(this.duration)}`;
+    }
   },
   methods: {
+    secondsToMinutesAndSeconds(seconds) {
+      let minutes = Math.floor(seconds / 60);
+      let transformedSeconds = Math.floor(seconds % 60);
+
+      let secondsStr = transformedSeconds < 10 ? `0${transformedSeconds}` : transformedSeconds; 
+      return `${minutes}:${secondsStr}`;
+    },
     setVolume(value) {
       this.volume = value;
       this.$refs.audio.volume = value / 100;

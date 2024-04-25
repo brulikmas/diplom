@@ -1,13 +1,17 @@
 <template>
-  <v-list-item class="track_item mb-4" rounded="lg">
+  <v-list-item 
+    class="track_item mb-4" 
+    rounded="lg"
+    :style="track.id === currentTrack?.id ? 'background: rgb(55, 46, 35)' : ''"
+  >
     <template #prepend>
       <v-btn
         class="mr-2"
         size="small"
-        icon="mdi-play"
+        :icon="getPlayIcon"
         color="orange"
         variant="text"
-        @click="play(track)"
+        @click="play(track, !isPlaying)"
       ></v-btn>
 
       <v-list-item-media class="mr-4">
@@ -50,6 +54,8 @@
       <p class="mr-2">{{track.rating}}</p>
 
       <v-btn
+        class="cart_btn"
+        width="100"
         size="small"
         prepend-icon="mdi-cart-arrow-down"
         color="orange"
@@ -60,7 +66,7 @@
   </v-list-item>
 </template>
 <script>
-import { mapActions } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useAudioPlayerStore } from '../store/audioPlayerStore';
 
 export default {
@@ -72,6 +78,14 @@ export default {
     }
   },
   computed: {
+    ...mapState(useAudioPlayerStore, ['currentTrack', 'isPlaying']),
+    getPlayIcon() {
+      if (this.track.id !== this.currentTrack?.id) {
+        return 'mdi-play';
+      } else {
+        return this.isPlaying ? 'mdi-pause' : 'mdi-play';
+      }
+    },
     getLowestPrice() {
       let lowestPrice = this.track.trackLicenses[0].custom_price;
 
@@ -89,7 +103,10 @@ export default {
   }
 }
 </script>
-<style scoped>
+<style lang="scss" scoped>
+:deep(.cart_btn .v-btn__content) {
+  width: 53px;
+}
 .track_item:hover {
   cursor: pointer;
   background: rgb(55, 46, 35);

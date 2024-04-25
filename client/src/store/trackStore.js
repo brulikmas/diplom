@@ -15,13 +15,13 @@ export const useTrackStore = defineStore('trackStore', {
           trackLicenses: [
             {
                 id: 29,
-                custom_price: 1000,
+                custom_price: 10000,
                 trackId: 22,
                 licenseId: 25
             },
             {
                 id: 30,
-                custom_price: 2000,
+                custom_price: 200000,
                 trackId: 22,
                 licenseId: 26
             },
@@ -33,7 +33,7 @@ export const useTrackStore = defineStore('trackStore', {
           name: 'Okay',
           rating: 0,
           icon: 'https://cdn.vuetifyjs.com/images/parallax/material.jpg',
-          mp3tag: 'http://localhost:5000/2e608974-90bd-414b-806f-cbe334d364a4.mp3',
+          mp3tag: 'http://localhost:5000/sample-3s.mp3',
           userId: 1,
           trackLicenses: [
             {

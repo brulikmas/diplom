@@ -8,17 +8,20 @@
     <audio-player
       :src="currentTrack.mp3tag"
       :track="currentTrack"
+      autoplay
       allow-previous
       allow-next
       :album-art="currentTrack.icon"
-      @next-audio="nextSrc()"
-      @previous-audio="prevSrc()"
+      :playing="isPlaying"
+      @next-audio="switchTrack('next')"
+      @previous-audio="switchTrack('previous')"
+      @changePlayingState="v => play(currentTrack, v)"
     ></audio-player>
   </v-bottom-sheet>
 </template>
 <script>
 import AudioPlayer from './AudioPlayer.vue';
-import { mapState } from 'pinia'
+import { mapState, mapActions, mapWritableState } from 'pinia'
 import { useAudioPlayerStore } from '../store/audioPlayerStore';
 
 export default {
@@ -26,7 +29,10 @@ export default {
     AudioPlayer,
   },
   computed: {
-    ...mapState(useAudioPlayerStore, ['isAudioBottomSheetOpen', 'currentTrack']),
+    ...mapState(useAudioPlayerStore, ['isAudioBottomSheetOpen', 'currentTrack', 'isPlaying']),
+  },
+  methods: {
+    ...mapActions(useAudioPlayerStore, ['play', 'switchTrack']),
   }
 }
 </script>
