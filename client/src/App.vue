@@ -32,6 +32,13 @@ export default {
 </script>
 <style>
 html {
-  overflow-y: hidden !important;
+  overflow-y: auto !important;
+}
+.link {
+  text-decoration: none;
+  color: inherit;
+}
+.link:hover {
+  text-decoration: underline;
 }
 </style>

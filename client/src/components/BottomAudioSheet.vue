@@ -21,7 +21,7 @@
 </template>
 <script>
 import AudioPlayer from './AudioPlayer.vue';
-import { mapState, mapActions, mapWritableState } from 'pinia'
+import { mapState, mapActions, mapWritableState } from 'pinia';
 import { useAudioPlayerStore } from '../store/audioPlayerStore';
 
 export default {

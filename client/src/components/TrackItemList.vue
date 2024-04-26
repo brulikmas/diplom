@@ -111,11 +111,4 @@ export default {
   cursor: pointer;
   background: rgb(55, 46, 35);
 }
-.link {
-  text-decoration: none;
-  color: inherit;
-}
-.link:hover {
-  text-decoration: underline;
-}
 </style>
