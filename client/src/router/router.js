@@ -44,7 +44,7 @@ const routes = [
     }
   },
   {
-    path: '/licenseItem/:id',
+    path: '/editLicense/:id',
     component: EditLicense,
     meta: { 
       requiresAuth: true,

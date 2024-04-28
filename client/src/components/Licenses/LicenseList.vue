@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panels style="width: 80%">
+  <v-expansion-panels>
     <license-item
       v-for="license in licenses"
       :key="license.id"

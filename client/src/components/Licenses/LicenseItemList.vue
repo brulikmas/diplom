@@ -14,11 +14,11 @@
 
       <v-btn
         v-if="isEdit"
-        @click.stop=""
         icon="mdi-pencil"
         color="orange"
         size="large"
         variant="text"
+        @click.stop="editLicense()"
       ></v-btn>
     </v-expansion-panel-title>
 
@@ -46,6 +46,11 @@ export default {
       default: false,
     }
   },
+  methods: {
+    editLicense() {
+      this.$router.push(`/editLicense/${this.license.id}`);
+    }
+  }
 }
 </script>
 <style>
