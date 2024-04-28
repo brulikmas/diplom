@@ -2,7 +2,7 @@ import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router'
 import Auth from '../pages/Auth.vue';
 import Basket from '../pages/Basket.vue';
 import EditTrack from '../pages/EditTrack.vue';
-import LicenseItem from '../pages/LicenseItem.vue';
+import EditLicense from '../pages/EditLicense.vue';
 import TrackItem from '../pages/TrackItem.vue';
 import Tracks from '../pages/Tracks.vue';
 import TracksEditor from '../pages/TracksEditor.vue';
@@ -45,7 +45,7 @@ const routes = [
   },
   {
     path: '/licenseItem/:id',
-    component: LicenseItem,
+    component: EditLicense,
     meta: { 
       requiresAuth: true,
       isBeatmaker : true

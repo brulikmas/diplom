@@ -42,7 +42,7 @@
               </v-btn>
 
               <v-btn
-                class="mr-1 pl-0"
+                class="mr-1"
                 icon="mdi-creation"
                 variant="text"
                 size="x-small"
