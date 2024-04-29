@@ -4,54 +4,55 @@
   >
     <template #prepend>
       <v-img
-          :width="250"
-          aspect-ratio="1"
-          cover
-          :src="tracks[0].icon"
-          rounded="lg"
-        ></v-img>
-        <div class="d-flex flex-column justify-space-between ml-4 mt-2">
-          <div>
-            <v-card-title>
-              <h1>{{ tracks[0].name }}</h1>
-            </v-card-title>
-  
-            <v-card-subtitle class="mt-2">
-              <h2>
-                <router-link 
-                  :to="`/userProfile/${tracks[0].userId}`"
-                  class="link"
-                >
-                  {{ tracks[0].userNickname }}
-                </router-link>
-              </h2>
-            </v-card-subtitle>
-          </div>
+        :width="250"
+        aspect-ratio="1"
+        cover
+        :src="tracks[0].icon"
+        rounded="lg"
+      ></v-img>
 
-          <div>
-            <v-card-actions class="pl-0">
-              <v-btn
-                class="cart_btn"
-                width="100"
-                size="small"
-                prepend-icon="mdi-cart-arrow-down"
-                color="orange"
-                variant="elevated"
+      <div class="d-flex flex-column justify-space-between ml-4 mt-2">
+        <div>
+          <v-card-title>
+            <h1>{{ tracks[0].name }}</h1>
+          </v-card-title>
+
+          <v-card-subtitle class="mt-2">
+            <h2>
+              <router-link 
+                :to="`/userProfile/${tracks[0].userId}`"
+                class="link"
               >
-                {{getLowestPrice}} ₽
-              </v-btn>
-
-              <v-btn
-                class="mr-1"
-                icon="mdi-creation"
-                variant="text"
-                size="x-small"
-              ></v-btn>
-    
-              <p class="mr-2">{{tracks[0].rating}}</p>
-            </v-card-actions>
-          </div>
+                {{ tracks[0].userNickname }}
+              </router-link>
+            </h2>
+          </v-card-subtitle>
         </div>
+
+        <div>
+          <v-card-actions class="pl-0">
+            <v-btn
+              class="cart_btn"
+              width="100"
+              size="small"
+              prepend-icon="mdi-cart-arrow-down"
+              color="orange"
+              variant="elevated"
+            >
+              {{getLowestPrice}} ₽
+            </v-btn>
+
+            <v-btn
+              class="mr-1"
+              icon="mdi-creation"
+              variant="text"
+              size="x-small"
+            ></v-btn>
+  
+            <p class="mr-2">{{tracks[0].rating}}</p>
+          </v-card-actions>
+        </div>
+      </div>
     </template>
 
     <v-card-text class="mt-6">

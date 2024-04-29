@@ -31,6 +31,26 @@ export const useTrackStore = defineStore('trackStore', {
                 licenseId: 26
             },
           ],
+          files: [
+            {
+                id: 27,
+                type: "mp3",
+                path: "C:\\\\Programmirovanie\\\\diplom\\\\diplom\\\\server\\\\files\\9\\22\\sample-3s.wav",
+                trackId: 22
+            },
+            {
+                id: 28,
+                type: "wav",
+                path: "C:\\\\Programmirovanie\\\\diplom\\\\diplom\\\\server\\\\files\\9\\22\\sample-3s.wav",
+                trackId: 22
+            },
+            {
+                id: 29,
+                type: "trackout",
+                path: "C:\\\\Programmirovanie\\\\diplom\\\\diplom\\\\server\\\\files\\9\\22\\Изменения.zip",
+                trackId: 22
+            }
+        ]
         },
         {
           id: 2,

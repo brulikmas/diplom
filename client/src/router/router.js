@@ -44,6 +44,14 @@ const routes = [
     }
   },
   {
+    path: '/addTrack',
+    component: EditTrack,
+    meta: { 
+      requiresAuth: true,
+      isBeatmaker : true
+    }
+  },
+  {
     path: '/editLicense/:id',
     component: EditLicense,
     meta: { 

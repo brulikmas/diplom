@@ -10,14 +10,29 @@ const licenses = [
   {
     type: 'base',
     name: 'Базовая лицензия',
+    price: 1000,
+    count_streams: 50000,
+    count_copies: 5000,
+    count_video_streams: 10000,
+    count_performances: 5,
   },
   {
     type: 'premium',
     name: 'Премиум лицензия',
+    price: 3000,
+    count_streams: 200000,
+    count_copies: 15000,
+    count_video_streams: 150000,
+    count_performances: 10,
   },
   {
     type: 'exclusive',
     name: 'Эксклюзивная лицензия',
+    price: 5000,
+    count_streams: 999999999999,
+    count_copies: 999999999999,
+    count_video_streams: 999999999999,
+    count_performances: 999999999999,
   }
 ]
 
@@ -58,6 +73,11 @@ class UserController {
           userId: user.id,
           type: license.type,
           name: license.name,
+          price: license.price,
+          count_streams: license.count_streams,
+          count_copies: license.count_copies,
+          count_video_streams: license.count_video_streams,
+          count_performances: license.count_performances,
         });
   
         if (license.type !== 'base') {

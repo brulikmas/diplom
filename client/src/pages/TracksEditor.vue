@@ -1,6 +1,17 @@
 <template>
   <v-list class="track_list mt-12">
-    <h1 class="mb-4"> Редактор </h1>
+    <div class="d-flex justify-space-between align-center">
+      <h1 class="mb-4"> Редактор </h1>
+  
+      <v-btn
+        variant="outlined"
+        color="orange"
+        prepend-icon="mdi-plus"
+        to="/addTrack"
+      >
+        Создать трек
+      </v-btn>
+    </div>
 
     <v-list-item
       v-for="track in tracks"
