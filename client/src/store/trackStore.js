@@ -1,8 +1,12 @@
 import { defineStore } from 'pinia';
+import { useLicenseStore } from './licenseStore';
 
 export const useTrackStore = defineStore('trackStore', {
   state: () => {
     return {
+      isTlDialogOpen: false,
+      dialogTrackLicenses: [],
+      selectedToCartTrackId: null, 
       tracks: [
         {
           id: 1,
@@ -22,19 +26,19 @@ export const useTrackStore = defineStore('trackStore', {
               id: 29,
               custom_price: 10000,
               trackId: 22,
-              licenseId: 20
+              licenseId: 22
             },
             {
               id: 30,
               custom_price: 200000,
               trackId: 22,
-              licenseId: 21
+              licenseId: 20
             },
             {
               id: 31,
               custom_price: 500000,
               trackId: 22,
-              licenseId: 22
+              licenseId: 21
             },
           ],
           files: [
@@ -154,6 +158,23 @@ export const useTrackStore = defineStore('trackStore', {
     }
   },
   actions: {
+    async openTlDialog(trackId) {
+      this.dialogTrackLicenses = [];
+      this.selectedToCartTrackId = trackId;
+      const licenseStore = useLicenseStore();
+      this.isTlDialogOpen = true;
+      //this.dialogTrackLicenses = this.tracks[trackId].trackLicenses;
 
+      //здесь нужно будет делать запросы на лицензии по userId
+      //const licenses = await axios.get(userId)
+      licenseStore.sortLicensesByType(licenseStore.licenses);
+
+      console.log(licenseStore.licenses)
+      licenseStore.licenses.forEach(license => {
+        let trackLicense = this.tracks.find(t => t.id === trackId).trackLicenses.find(tl => tl.licenseId === license.id);
+        trackLicense.license = license;
+        this.dialogTrackLicenses.push(trackLicense);
+      })
+    }
   }
 })

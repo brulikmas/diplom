@@ -8,6 +8,7 @@
 
       <v-main class="d-flex align-center justify-center" style="min-height: 300px;">
         <bottom-audio-sheet></bottom-audio-sheet>
+        <track-licensec-dialog></track-licensec-dialog>
         <router-view></router-view>
       </v-main>
   
@@ -19,13 +20,16 @@ import { mapState } from 'pinia';
 import BottomAudioSheet from './components/BottomAudioSheet.vue';
 import NavBar from './components/NavBar.vue';
 import NavDrawer from './components/NavDrawer.vue';
+import TrackLicensecDialog from './components/Tracks/TrackLicenseDialog.vue';
 import { useAudioPlayerStore } from './store/audioPlayerStore';
+
 
 export default {
   components: {
     NavBar,
     NavDrawer,
-    BottomAudioSheet
+    BottomAudioSheet,
+    TrackLicensecDialog
   },
   data() {
     return {

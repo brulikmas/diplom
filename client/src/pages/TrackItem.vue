@@ -38,6 +38,7 @@
               prepend-icon="mdi-cart-arrow-down"
               color="orange"
               variant="elevated"
+              @click="openTlDialog(tracks[0].id)"
             >
               {{getLowestPrice}} ₽
             </v-btn>
@@ -73,7 +74,7 @@
 </template>
 <script>
 import { useTrackStore } from '../store/trackStore';
-import { mapState } from 'pinia';
+import { mapState, mapActions } from 'pinia';
 export default {
   computed: {
     ...mapState(useTrackStore, ['tracks']),
@@ -89,6 +90,9 @@ export default {
       return lowestPrice;
     }
   },
+  methods: {
+    ...mapActions(useTrackStore, ['openTlDialog']),
+  }
 }
 </script>
 <style lang="scss" scoped>

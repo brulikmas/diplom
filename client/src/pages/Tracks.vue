@@ -13,7 +13,7 @@
 
 </template>
 <script>
-import TrackItemList from '../components/TrackItemList.vue';
+import TrackItemList from '../components/Tracks/TrackItemList.vue';
 import FiltersForm from '../components/filters/FiltersForm.vue';
 import { useTrackStore } from '../store/trackStore';
 import { mapState } from 'pinia';

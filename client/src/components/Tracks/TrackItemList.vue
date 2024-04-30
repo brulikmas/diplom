@@ -59,6 +59,7 @@
         size="small"
         prepend-icon="mdi-cart-arrow-down"
         color="orange"
+        @click="openTlDialog(track.id)"
       >
         {{getLowestPrice}} ₽
       </v-btn>
@@ -66,8 +67,9 @@
   </v-list-item>
 </template>
 <script>
-import { mapActions, mapState } from 'pinia'
-import { useAudioPlayerStore } from '../store/audioPlayerStore';
+import { mapActions, mapState } from 'pinia';
+import { useAudioPlayerStore } from '../../store/audioPlayerStore';
+import { useTrackStore } from '../../store/trackStore';
 
 export default {
   props: {
@@ -100,6 +102,7 @@ export default {
   },
   methods: {
     ...mapActions(useAudioPlayerStore, ['play']),
+    ...mapActions(useTrackStore, ['openTlDialog']),
   }
 }
 </script>
