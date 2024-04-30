@@ -141,7 +141,7 @@
           variant="outlined"
           class="mr-4"
         >
-          {{ 'Сохранить' }}
+          Сохранить
         </v-btn>
   
         <v-btn

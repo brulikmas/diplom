@@ -19,16 +19,22 @@ export const useTrackStore = defineStore('trackStore', {
           userId: 1,
           trackLicenses: [
             {
-                id: 29,
-                custom_price: 10000,
-                trackId: 22,
-                licenseId: 25
+              id: 29,
+              custom_price: 10000,
+              trackId: 22,
+              licenseId: 20
             },
             {
-                id: 30,
-                custom_price: 200000,
-                trackId: 22,
-                licenseId: 26
+              id: 30,
+              custom_price: 200000,
+              trackId: 22,
+              licenseId: 21
+            },
+            {
+              id: 31,
+              custom_price: 500000,
+              trackId: 22,
+              licenseId: 22
             },
           ],
           files: [

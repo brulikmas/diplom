@@ -8,13 +8,14 @@
     >
       <v-row>
         <v-col cols="8">
+
           <h3>Mp3 файл с войстегом для воспроизведения</h3>
 
           <v-file-input
-            v-model="mp3TagFile"
+            v-model="audioFiles.mp3Tag.file"
             class="mt-4"
             accept="audio/mp3"
-            :label="(!mp3TagFile || !mp3TagFile.length) ? fileNames.mp3 : 'Mp3 с войстегом'"
+            :label="getText('mp3Tag')"
             base-color="orange"
             variant="outlined"
             prepend-inner-icon="mdi-music"
@@ -23,12 +24,131 @@
           ></v-file-input>
 
           <h3>Файлы для скачивания после покупки</h3>
+
+          <div class="mt-4 d-flex flex-wrap">
+            <v-file-input
+              v-model="audioFiles.mp3.file"
+              class="mb-2 mr-4"
+              accept="audio/mp3"
+              :label="getText('mp3')"
+              base-color="orange"
+              variant="outlined"
+              prepend-inner-icon="mdi-music"
+              prepend-icon=""
+              :rules="filesRules"
+            ></v-file-input>
+  
+            <v-file-input
+              v-model="audioFiles.wav.file"
+              class="mb-2"
+              accept="audio/wav"
+              :label="getText('wav')"
+              base-color="orange"
+              variant="outlined"
+              prepend-inner-icon="mdi-waveform"
+              prepend-icon=""
+              :rules="filesRules"
+            ></v-file-input>
+  
+          </div>
+
+          <v-file-input
+            v-model="audioFiles.trackout.file"
+            class="mb-2"
+            accept="application/vnd.rar, application/zip"
+            :label="getText('trackout')"
+            base-color="orange"
+            variant="outlined"
+            prepend-inner-icon="mdi-folder-music"
+            prepend-icon=""
+            :rules="filesRules"
+          ></v-file-input>
+
+
+          <h3>Основная информация</h3>
+
+          <v-text-field
+            v-model="track.name"
+            class="mt-4 mb-2"
+            label="Название"
+            placeholder="Введите название"
+            clearable
+            variant="outlined"
+            :rules="stringRules"
+          ></v-text-field>
+
+          <v-text-field
+            v-model="track.description"
+            class="mb-2"
+            label="Описание"
+            placeholder="Введите описание"
+            clearable
+            variant="outlined"
+            :rules="stringRules"
+          ></v-text-field>
+
+          <v-text-field
+            v-model.number="track.bpm"
+            class="mb-2"
+            type="number"
+            label="BPM"
+            placeholder="BPM"
+            variant="outlined"
+            clearable
+            :rules="bpmRules"
+          ></v-text-field>
+
+          <v-select
+            v-model="track.genre"
+            class="mb-2"
+            :items="genreItems"
+            label="Жанр"
+            variant="outlined"
+            :rules="notNullRules"
+          ></v-select>
+
+          <v-select
+            v-model="track.tonality"
+            class="mb-2"
+            :items="tonalityItems"
+            label="Тональность"
+            variant="outlined"
+            :rules="notNullRules"
+          ></v-select>
+
+          <v-select
+            v-model="track.mood"
+            class="mb-2"
+            :items="moodItems"
+            label="Настроение"
+            variant="outlined"
+            :rules="notNullRules"
+          ></v-select>
+
+          <h3 class="mb-4">Настройки трек-лицензий</h3>
+          
+          <div
+            v-for="license in licenses"
+            :key="license.id"
+          >
+            <h4 class="mb-2">Имя лицензии: {{ license.name }}</h4>
+
+            <v-text-field
+              v-model.number="findTrackLicense(license.id).custom_price"
+              type="number"
+              label="Цена"
+              placeholder="Цена"
+              variant="outlined"
+              clearable
+              :rules="notNullRules"
+            ></v-text-field>
+          </div>
         </v-col>
 
         <v-col cols="4">
           <v-img
             :width="300"
-            :src="imgUrl || track.icon"
+            :src="imgUrl || track.icon || 'src/assets/noimg.jpg'"
             class="mb-4"
             aspect-ratio="1"
             cover
@@ -49,15 +169,15 @@
       </v-row>
 
       <v-row>
-        <v-spacer></v-spacer>
         <v-btn
-          :disabled="!isValidForm"
+          :disabled="!isValidForm || !(isFilesChanged || isDirty)"
           color="orange"
           size="large"
           variant="outlined"
           class="mr-4"
+          @click="save"
         >
-          {{ 'Сохранить' }}
+          Сохранить
         </v-btn>
   
         <v-btn
@@ -75,12 +195,20 @@
 </template>
 <script>
 import { useTrackStore } from '../store/trackStore';
-import { mapState } from 'pinia';
+import { useLicenseStore } from '../store/licenseStore';
+import { mapActions, mapState } from 'pinia';
+import { genreItems, moodItems, tonalityItems } from '../components/filters/filtersItems';
 
 export default {
   data() {
     return {
+      genreItems,
+      moodItems,
+      tonalityItems,
+      thisObject: this,
       isValidForm: false,
+      trackScreenshot: null,
+      isDirty: false,
       track: {
         id: null,
         name: 'Новый бит',
@@ -96,26 +224,71 @@ export default {
       imgFile: null,
       filesRules: [
         value => {
-          if (value.length !== 0) return true;
+          if (this.thisObject.isEdit) return true;
+
+          if (!this.thisObject.isEdit && value.length !== 0) return true;
 
           return 'Необходимо загрузить файл!'
         }
       ],
-      mp3TagFile: null,
-      fileNames: {
-        mp3: '',
-        wav: '',
-        trackout: '',
+      notNullRules: [
+        value => {
+          if (value) return true;
+
+          return 'Обязательное поле!'
+        }
+      ],
+      bpmRules: [
+        value => {
+          if (value) return true;
+
+          return 'Введите значение!'
+        },
+        value => {
+          if (+value < 500) return true;
+
+          return 'Bpm должен быть меньше 500!'
+        }
+      ],
+      stringRules: [
+        value => {
+          if (value) return true;
+
+          return 'Введите значение';
+        },
+        value => {
+          if (value.length < 50) return true;
+
+          return 'Количество символов должно быть меньше 50'
+        }
+      ],
+      audioFiles: {
+        mp3Tag: {
+          fileName: '',
+          label: 'Mp3 с войстегом',
+          file: null,
+        },
+        mp3: {
+          fileName: '',
+          label: 'Mp3',
+          file: null,
+        },
+        wav: {
+          fileName: '',
+          label: 'Wav',
+          file: null,
+        },
+        trackout: {
+          fileName: '',
+          label: 'Архив по дорожкам',
+          file: null,
+        },
       }
-    }
-  },
-  watch: {
-    imgFile(value) {
-      console.log(value)
     }
   },
   computed: {
     ...mapState(useTrackStore, ['tracks']),
+    ...mapState(useLicenseStore, ['licenses']),
     imgUrl() {
       if (!this.imgFile) return;
 
@@ -126,17 +299,84 @@ export default {
       } else {
         return URL.createObjectURL(this.imgFile);
       }
+    },
+    isEdit() {
+      return this.$route.path.includes('edit');
+    },
+    isFilesChanged() {
+      if ((this.imgFile && this.imgFile?.length === undefined) || (this.imgFile?.length && this.imgFile?.length !== 0)) {
+        return true;
+      }
+
+      for (let key in this.audioFiles) {
+        if ((this.audioFiles[key].file && this.audioFiles[key].file?.length === undefined)
+          || (this.audioFiles[key].file?.length && this.audioFiles[key].file?.length !== 0)) 
+        {
+          return true;
+        }
+      };
+
+      return false;
+    }
+  },
+  watch: {
+    track: {
+      handler(newValue) {
+        if (this.trackScreenshot !== JSON.stringify(newValue)) {
+          this.isDirty = true;
+        } else {
+          this.isDirty = false;
+        }
+      },
+      deep: true,
+    },
+  },
+  methods: {
+    ...mapActions(useLicenseStore, ['sortLicensesByType']),
+    getText(type) {
+      const fileData = this.audioFiles[type].file;
+
+      if (!fileData || fileData?.length === 0) {
+        return this.audioFiles[type].fileName || this.audioFiles[type].label;
+      }
+
+      if (fileData.length === undefined || fileData.length !== 0) {
+        return this.audioFiles[type].label;
+      }
+
+      return this.audioFiles[type].label;
+    },
+    findTrackLicense(licenseId) {
+      return this.track.trackLicenses.find(tl => tl.licenseId === licenseId);
+    },
+    save() {
+      console.log(1);
     }
   },
   created() {
-    this.track = this.tracks[0];
+    this.sortLicensesByType(this.licenses);
 
-    if (this.track?.files?.length > 0) {
-      this.track.files.forEach(f => {
-        let splitArray = f.path.split('\\');
-        this.fileNames[f.type] = splitArray[splitArray.length - 1];
+    if (this.isEdit) {
+      this.track = this.tracks[0];
+  
+      if (this.track?.files?.length > 0) {
+        this.track.files.forEach(f => {
+          let splitArray = f.path.split('\\');
+          this.audioFiles[f.type].fileName = splitArray[splitArray.length - 1];
+        });
+      }
+
+      this.audioFiles.mp3Tag.fileName = `Tag-${this.audioFiles.mp3.fileName}`;
+    } else {
+      this.track.trackLicenses = this.licenses.map(license => {
+        return {
+          licenseId: license.id,
+          custom_price: license.price,
+        }
       });
     }
+
+    this.trackScreenshot = JSON.stringify(this.track);
   }
 }
 </script>

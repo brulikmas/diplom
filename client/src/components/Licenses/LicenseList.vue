@@ -11,16 +11,12 @@
 <script>
 import LicenseItem from './LicenseItemList.vue';
 import { useLicenseStore } from '../../store/licenseStore';
-import { mapState } from 'pinia';
+import { mapState, mapActions } from 'pinia';
 
 export default {
   data() {
     return {
-      order: {
-        base: 0,
-        premium: 1,
-        exclusive: 2,
-      }
+
     }
   },
   components: {
@@ -36,16 +32,10 @@ export default {
     ...mapState(useLicenseStore, ['licenses']),
   },
   created() {
-    this.sortByTypes();
+    this.sortLicensesByType(this.licenses);
   },
   methods: {
-    sortByTypes() {
-      this.licenses.sort((a, b) => {
-        const typeNumber1 =  this.order[a.type];
-        const typeNumber2 =  this.order[b.type];
-        return typeNumber1 - typeNumber2;
-      });
-    }
+    ...mapActions(useLicenseStore, ['sortLicensesByType']),
   }
 }
 </script>

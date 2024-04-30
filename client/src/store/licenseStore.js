@@ -1,4 +1,16 @@
 import { defineStore } from 'pinia';
+const licenseOrder = {
+  base: 0,
+  premium: 1,
+  exclusive: 2,
+};
+
+const availableFilesOrder = {
+  mp3: 0,
+  wav: 1,
+  trackout: 2,
+}
+
 
 export const useLicenseStore = defineStore('licenseStore', {
   state: () => {
@@ -85,6 +97,19 @@ export const useLicenseStore = defineStore('licenseStore', {
     }
   },
   actions: {
-
+    sortLicensesByType(licenses) {
+      licenses.sort((a, b) => {
+        const typeNumber1 =  licenseOrder[a.type];
+        const typeNumber2 =  licenseOrder[b.type];
+        return typeNumber1 - typeNumber2;
+      });
+    },
+    sortAvailableFilesByType(availableFiles) {
+      availableFiles.sort((a, b) => {
+        const typeNumber1 =  availableFilesOrder[a.type];
+        const typeNumber2 =  availableFilesOrder[b.type];
+        return typeNumber1 - typeNumber2;
+      });
+    }
   }
 })
