@@ -9,12 +9,6 @@
         >
           Главная
         </v-list-item>
-        <v-list-item
-          prepend-icon="mdi-creation"
-          to="/tracks"
-        >
-          Популярное
-        </v-list-item>
         
         <v-divider></v-divider>
 

@@ -26,17 +26,12 @@ export default {
     isEdit: {
       type: Boolean,
       default: false,
+    },
+    licenses: {
+      type: Array,
+      default: [],
     }
   },
-  computed: {
-    ...mapState(useLicenseStore, ['licenses']),
-  },
-  created() {
-    this.sortLicensesByType(this.licenses);
-  },
-  methods: {
-    ...mapActions(useLicenseStore, ['sortLicensesByType']),
-  }
 }
 </script>
 <style>

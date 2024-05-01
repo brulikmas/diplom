@@ -36,7 +36,7 @@
 
     <v-list-item-subtitle>
       <router-link 
-        :to="`/userProfile/${track.userId}`"
+        :to="`/userProfile/${track.userId}/info`"
         class="link"
       >
         {{ track.userNickname }}
