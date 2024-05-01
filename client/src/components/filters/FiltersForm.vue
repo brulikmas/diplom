@@ -7,7 +7,7 @@
       prepend-inner-icon="mdi-magnify"
       variant="outlined"
       clearable
-      v-model="name"
+      v-model="filter.name"
     ></v-text-field>
     <v-text-field
       class="mr-2"
@@ -15,7 +15,7 @@
       placeholder="BPM"
       variant="outlined"
       clearable
-      v-model="bpm"
+      v-model="filter.bpm"
     ></v-text-field>
     <v-select
       class="mr-2"
@@ -24,7 +24,7 @@
       label="Жанр"
       variant="outlined"
       clearable
-      v-model="genre"
+      v-model="filter.genre"
     ></v-select>
     <v-select
       class="mr-2"
@@ -33,7 +33,7 @@
       label="Настроение"
       variant="outlined"
       clearable
-      v-model="mood"
+      v-model="filter.mood"
     ></v-select>
     <v-select
       :items="tonalityItems"
@@ -41,7 +41,7 @@
       label="Тональность"
       variant="outlined"
       clearable
-      v-model="tonality"
+      v-model="filter.tonality"
     ></v-select>
   </v-form>
 </template>
@@ -53,11 +53,13 @@ export default {
       genreItems,
       moodItems,
       tonalityItems,
-      name: '',
-      bpm: '',
-      genre: '',
-      mood: '',
-      tonality: '',
+      filter: {
+        name: '',
+        bpm: '',
+        genre: '',
+        mood: '',
+        tonality: '',
+      }
     }
   }
 }

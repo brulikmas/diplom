@@ -7,7 +7,6 @@
         <v-img
           aspect-ratio="1"
           cover
-          :width="250"
           :src="user.avatar || '/src/assets/noavatar.jpg'"
           rounded="lg"
         ></v-img>

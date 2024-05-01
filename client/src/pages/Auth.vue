@@ -45,6 +45,17 @@
           clearable
         ></v-text-field>
 
+        <v-switch
+          v-if="!isLogin"
+          color="orange"
+          v-model="role"
+          label="Вы битмейкер?"
+          false-value="USER"
+          true-value="BEATMAKER"
+          hide-details
+        ></v-switch>
+
+
         <p class="mb-2">
           {{ isLogin ? 'Нет аккаунта?' : 'Есть аккаунт?' }} 
           <router-link 
@@ -61,6 +72,7 @@
           size="large"
           variant="outlined"
           block
+          @click="auth()"
         >
           {{ isLogin ? 'Войти' : 'Зарегистрироваться' }}
         </v-btn>
@@ -68,6 +80,10 @@
     </v-card>
 </template>
 <script>
+import { login, registration, getUser } from '../http/userAPI';
+import { mapWritableState } from 'pinia';
+import { useUserStore } from '../store/userStore';
+
 export default {
   data() {
     return {
@@ -76,6 +92,7 @@ export default {
       email: '',
       password: '',
       secondPassword: '',
+      role: 'USER',
       nickNameRules: [
         value => {
           if (value) return true;
@@ -137,6 +154,7 @@ export default {
     }
   },
   computed: {
+    ...mapWritableState(useUserStore, ['user', 'isAuth']),
     isLogin() {
       return this.$route.name === 'login';
     }
@@ -145,7 +163,28 @@ export default {
     '$route.name'(newValue) {
       this.$refs.form.reset();
     }
-  }
+  },
+  methods: {
+    async auth() {
+      console.log(import.meta.env.VITE_API_URL)
+      try {
+        let user = null;
+
+        if (this.isLogin) {
+          user = await login(this.email, this.password);
+        } else {
+          user = await registration(this.email, this.password, this.nickName, this.role)
+        }
+
+        this.user = await getUser(user.id);
+        this.isAuth = true;
+        this.$router.push('/tracks');
+      } catch (e) {
+        console.log(e)
+        alert(e.response.data.message)
+      }
+    }
+  },
 }
 </script>
 <style>

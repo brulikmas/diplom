@@ -1,5 +1,12 @@
 <template>
-  <v-layout class="rounded rounded-md flex-column">
+  <div v-if="isLoading">
+    Загрузка...
+  </div>
+
+  <v-layout
+    v-else
+    class="rounded rounded-md flex-column"
+  >
     <nav-bar
       @updateDrawer="drawer = !drawer"
     ></nav-bar>
@@ -16,12 +23,14 @@
   </v-layout>
 </template>
 <script>
-import { mapState } from 'pinia';
+import { mapState, mapWritableState } from 'pinia';
 import BottomAudioSheet from './components/BottomAudioSheet.vue';
 import NavBar from './components/NavBar.vue';
 import NavDrawer from './components/NavDrawer.vue';
 import TrackLicensecDialog from './components/Tracks/TrackLicenseDialog.vue';
 import { useAudioPlayerStore } from './store/audioPlayerStore';
+import { useUserStore } from './store/userStore';
+import { check, getUser } from './http/userAPI';
 
 
 export default {
@@ -34,10 +43,21 @@ export default {
   data() {
     return {
       drawer: true,
+      isLoading: true,
     };
   },
   computed: {
-      ...mapState(useAudioPlayerStore, ['isAudioBottomSheetOpen']),
+    ...mapState(useAudioPlayerStore, ['isAudioBottomSheetOpen']),
+    ...mapWritableState(useUserStore, ['user', 'isAuth']),
+  },
+  async created() {
+    try {
+      let userAfterCheck = await check();
+      this.user = await getUser(userAfterCheck.id);
+      this.isAuth = true;
+    } finally {
+      this.isLoading = false;
+    }
   }
 }
 </script>

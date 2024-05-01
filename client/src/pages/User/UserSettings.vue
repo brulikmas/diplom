@@ -120,7 +120,7 @@ export default {
       ],
       simpleFieldsRules: [
         value => {
-          if (value.length < 55) return true;
+          if (value?.length < 55) return true;
 
           return 'Количество символов должно быть меньше 55!';
         }

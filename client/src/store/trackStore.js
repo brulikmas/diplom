@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { useLicenseStore } from './licenseStore';
+import { getAll, getOne, getOneWithAuth, deleteTrack } from '../http/trackApi';
 
 export const useTrackStore = defineStore('trackStore', {
   state: () => {
@@ -7,6 +8,7 @@ export const useTrackStore = defineStore('trackStore', {
       isTlDialogOpen: false,
       dialogTrackLicenses: [],
       selectedToCartTrackId: null, 
+      isTrackLoading: false,
       tracks: [
         {
           id: 1,
@@ -175,6 +177,16 @@ export const useTrackStore = defineStore('trackStore', {
         trackLicense.license = license;
         this.dialogTrackLicenses.push(trackLicense);
       })
+    },
+    async getAll(params) {
+      try {
+        this.isTrackLoading = true;
+        this.tracks = await getAll(params);
+      } catch (e) {
+        alert(e.response.data.message);
+      } finally {
+        this.isTrackLoading = false;
+      }
     }
   }
 })

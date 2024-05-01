@@ -49,13 +49,14 @@
       <v-btn 
         to="/basket"
         stacked
+        class="mr-2"
       >
         <v-badge color="orange" :content="basketItems.length">
           <v-icon variant="text" icon="mdi-cart"/>
         </v-badge>
       </v-btn>
 
-      <v-btn icon="mdi-account"></v-btn>
+      <avatar-menu></avatar-menu>
     </div>
   </v-app-bar>
 </template>
@@ -63,8 +64,12 @@
 import { mapState } from 'pinia';
 import { useUserStore } from '../store/userStore';
 import { useCartStore } from '../store/cartStore';
+import AvatarMenu from './AvatarMenu.vue';
 
 export default {
+  components: {
+    AvatarMenu,
+  },
   emits: ['updateDrawer'],
   computed: {
     ...mapState(useUserStore, ['isAuth']),
