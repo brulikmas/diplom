@@ -34,7 +34,6 @@
         v-model="tab"
       >
         <v-tab 
-          :exact="true"
           :to="`/userProfile/${checkingUserProfile.id}/info`" 
           value="info"
         >

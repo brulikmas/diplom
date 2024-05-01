@@ -86,6 +86,11 @@ export default {
           if (value.length > 2) return true;
 
           return 'Длина никнейма должна быть больше 2 символов!';
+        },
+        value => {
+          if (value.length < 30) return true;
+
+          return 'Длина никнейма должна быть меньше 30 символов!';
         }
       ],
       emailRules: [

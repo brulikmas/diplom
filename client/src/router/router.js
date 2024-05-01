@@ -108,7 +108,7 @@ const routes = [
       },
       {
         path: '/user/balance',
-        purchase: UserBalance,
+        component: UserBalance,
         meta: {
           requiresAuth: true,
           isBeatmaker : true,

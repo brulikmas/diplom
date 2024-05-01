@@ -106,8 +106,8 @@ export const useLicenseStore = defineStore('licenseStore', {
     },
     sortAvailableFilesByType(availableFiles) {
       availableFiles.sort((a, b) => {
-        const typeNumber1 =  availableFilesOrder[a.type];
-        const typeNumber2 =  availableFilesOrder[b.type];
+        const typeNumber1 =  availableFilesOrder[a.file_type];
+        const typeNumber2 =  availableFilesOrder[b.file_type];
         return typeNumber1 - typeNumber2;
       });
     }

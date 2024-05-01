@@ -36,11 +36,22 @@
     </div>
 
     <div v-else>
-      <v-btn color="orange" variant="outlined">Загрузить</v-btn>
+      <v-btn 
+        color="orange" 
+        variant="outlined"
+        prepend-icon="mdi-plus"
+        to="/tracksEditor"
+        class="mr-2"
+      >
+        Загрузить
+      </v-btn>
   
-      <v-btn stacked>
-        <v-badge color="orange" content="9">
-          <v-icon icon="mdi-cart"/>
+      <v-btn 
+        to="/basket"
+        stacked
+      >
+        <v-badge color="orange" :content="basketItems.length">
+          <v-icon variant="text" icon="mdi-cart"/>
         </v-badge>
       </v-btn>
 
@@ -51,11 +62,13 @@
 <script>
 import { mapState } from 'pinia';
 import { useUserStore } from '../store/userStore';
+import { useCartStore } from '../store/cartStore';
 
 export default {
   emits: ['updateDrawer'],
   computed: {
     ...mapState(useUserStore, ['isAuth']),
+    ...mapState(useCartStore, ['basketItems']),
   }
 }
 </script>

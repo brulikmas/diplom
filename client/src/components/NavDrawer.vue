@@ -30,8 +30,22 @@
         <v-list-subheader>Аккаунт</v-list-subheader>
 
         <v-list-item
+          prepend-icon="mdi-currency-usd"
+          to="/user/balance"
+        >
+          Баланс
+        </v-list-item>
+
+        <v-list-item
+          prepend-icon="mdi-cart-check"
+          to="/user/purchase"
+        >
+          Покупки
+        </v-list-item>
+
+        <v-list-item
           prepend-icon="mdi-cog-outline"
-          to="/user"
+          to="/user/settings"
         >
           Найстройки
         </v-list-item>
