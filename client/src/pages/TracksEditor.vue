@@ -13,58 +13,72 @@
       </v-btn>
     </div>
 
-    <v-list-item
-      v-for="track in tracks"
-      :key="track.id"
-      class="track_item mb-4"
-    >
-      <template #prepend>
-        <v-list-item-media class="mr-4">
-          <v-img
-            :width="50"
-            aspect-ratio="1"
-            cover
-            :src="track.icon"
-            rounded="lg"
-          ></v-img>
-        </v-list-item-media>   
-      </template>
+    <div v-if="isTrackLoading">
+      Загрузка...
+    </div>
 
-      <v-list-item-title>
-      <router-link 
-        :to="`/editTrack/${track.id}`"
-        class="link"
+    <div v-else>
+      <v-list-item
+        v-for="track in tracks"
+        :key="track.id"
+        class="track_item mb-4"
       >
-        {{ track.name }}
-      </router-link>
-    </v-list-item-title>
-
-    <template #append>
-      <v-btn
-        size="small"
-        icon="mdi-pencil"
-        color="orange"
-        variant="text"
-        :to="`/editTrack/${track.id}`"
-      ></v-btn>
-
-      <v-btn
-        size="small"
-        icon="mdi-delete"
-        color="red"
-        variant="text"
-      ></v-btn>
-    </template>
-    </v-list-item>
+        <template #prepend>
+          <v-list-item-media class="mr-4">
+            <v-img
+              :width="50"
+              aspect-ratio="1"
+              cover
+              :src="track.icon"
+              rounded="lg"
+            ></v-img>
+          </v-list-item-media>   
+        </template>
+  
+        <v-list-item-title>
+        <router-link 
+          :to="`/editTrack/${track.id}`"
+          class="link"
+        >
+          {{ track.name }}
+        </router-link>
+      </v-list-item-title>
+  
+      <template #append>
+        <v-btn
+          size="small"
+          icon="mdi-pencil"
+          color="orange"
+          variant="text"
+          :to="`/editTrack/${track.id}`"
+        ></v-btn>
+  
+        <v-btn
+          size="small"
+          icon="mdi-delete"
+          color="red"
+          variant="text"
+        ></v-btn>
+      </template>
+      </v-list-item>
+    </div>
   </v-list>
 </template>
 <script>
 import { useTrackStore } from '../store/trackStore';
-import { mapState } from 'pinia';
+import { useUserStore } from '../store/userStore';
+import { mapState, mapActions } from 'pinia';
 
 export default {
   computed: {
-    ...mapState(useTrackStore, ['tracks']),
+    ...mapState(useTrackStore, ['tracks', 'isTrackLoading']),
+    ...mapState(useUserStore, ['user']),
+  },
+  methods: {
+    ...mapActions(useTrackStore, ['getAll']),
+  },
+  created() {
+    this.getAll({ userId: this.user.id });
   }
 }
 </script>

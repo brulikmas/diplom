@@ -6,12 +6,12 @@
       :no-click-animation="true"
   >
     <audio-player
-      :src="currentTrack.mp3tag"
+      :src="serverUrl + currentTrack.mp3tag"
       :track="currentTrack"
       autoplay
       allow-previous
       allow-next
-      :album-art="currentTrack.icon"
+      :album-art="serverUrl + currentTrack.icon"
       :playing="isPlaying"
       @next-audio="switchTrack('next')"
       @previous-audio="switchTrack('previous')"
@@ -25,6 +25,11 @@ import { mapState, mapActions, mapWritableState } from 'pinia';
 import { useAudioPlayerStore } from '../store/audioPlayerStore';
 
 export default {
+  data() {
+    return {
+      serverUrl: import.meta.env.VITE_API_URL,
+    }
+  },
   components: {
     AudioPlayer,
   },

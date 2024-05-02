@@ -1,8 +1,17 @@
 <template>
   <div class="mx-12 track_list_page">
-    <filters-form class="mt-12"></filters-form>
-  
-    <track-list :tracks="tracks"></track-list>
+      <filters-form class="mt-12"></filters-form>
+    
+      <div 
+        v-if="isTrackLoading"
+        class="mt-2"
+      >
+        Загрузка...
+      </div>
+      <track-list 
+        v-else
+        :tracks="tracks"
+        ></track-list>
   </div>
 
 </template>
@@ -10,7 +19,7 @@
 import TrackList from '../components/Tracks/TrackList.vue';
 import FiltersForm from '../components/filters/FiltersForm.vue';
 import { useTrackStore } from '../store/trackStore';
-import { mapState } from 'pinia';
+import { mapState, mapActions } from 'pinia';
 
 export default {
   components: {
@@ -18,7 +27,13 @@ export default {
     FiltersForm
   },
   computed: {
-    ...mapState(useTrackStore, ['tracks']),
+    ...mapState(useTrackStore, ['tracks', 'isTrackLoading']),
+  },
+  methods: {
+    ...mapActions(useTrackStore, ['getAll'])
+  },
+  created() {
+    this.getAll();
   }
 }
 </script>

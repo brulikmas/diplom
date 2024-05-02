@@ -137,7 +137,8 @@ class UserController {
         surname: user.surname,
         country: user.country,
         avatar: user.avatar,
-        info: user.info
+        info: user.info,
+        role: user.role,
       })
     } catch (e) {
       next(ApiError.badRequest(e.message));

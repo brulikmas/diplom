@@ -1,5 +1,10 @@
 <template>
+  <div v-if="isTrackLoading">
+    Загрузка...
+  </div>
+  
   <v-card
+    v-else
     class="trackItem_card mt-6"
   >
     <template #prepend>
@@ -77,7 +82,7 @@ import { useTrackStore } from '../store/trackStore';
 import { mapState, mapActions } from 'pinia';
 export default {
   computed: {
-    ...mapState(useTrackStore, ['tracks']),
+    ...mapState(useTrackStore, ['tracks', 'isTrackLoading']),
     getLowestPrice() {
       let lowestPrice = this.tracks[0].trackLicenses[0].custom_price;
 
@@ -91,7 +96,10 @@ export default {
     }
   },
   methods: {
-    ...mapActions(useTrackStore, ['openTlDialog']),
+    ...mapActions(useTrackStore, ['openTlDialog', 'getOne']),
+  },
+  created() {
+    this.getOne(this.$route.params.id);
   }
 }
 </script>
