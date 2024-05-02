@@ -1,5 +1,6 @@
 const { License, AvailableFile, TrackLicense, PurchaseItem } = require('../models/models');
 const ApiError = require('../error/ApiError');
+const typesMask = ['mp3', 'wav', 'trackout'];
 class LicenseController {
   async update(req, res, next) {
     try {
@@ -80,19 +81,18 @@ class LicenseController {
           }
         );
 
-        if (availableFiles.length >= currentLicense.availableFiles.length) {
-          availableFiles.forEach(v => {
-            if (!currentLicense.availableFiles.find(af => af.file_type === v.file_type)) {
-              AvailableFile.create({ licenseId: id, file_type: v.file_type });
-            }
-          });
-        } else {
-          currentLicense.availableFiles.forEach(v => {
-            if (!availableFiles.find(af => af.file_type === v.file_type)) {
-              AvailableFile.destroy({ where: { id: v.id } });
-            }
-          })
-        }
+        typesMask.forEach(v => {
+          let af1 = availableFiles.find(af => af.file_type === v);
+          let af2 = currentLicense.availableFiles.find(caf => caf.file_type === v);
+
+          if (af1 && !af2) {
+            AvailableFile.create({ licenseId: id, file_type: af1.file_type });
+          }
+
+          if (!af1 && af2) {
+            AvailableFile.destroy({ where: { id: af2.id } });
+          }
+        })
 
         newLicense = await License.findOne({ where: { id } });
       }

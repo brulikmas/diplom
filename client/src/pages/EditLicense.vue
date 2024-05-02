@@ -1,7 +1,16 @@
 <template>
-  <v-card class="mt-6" style="width: 80%; background: none;">
+  <v-card
+    class="mt-6" 
+    style="width: 80%; background: none;"
+  >
     <v-card-title class="px-6 mb-4"><h2>Редактирование лицензии</h2></v-card-title>
+
+    <div v-if="isLicenseLoading">
+      Загрузка...
+    </div>
+
     <v-form
+      v-else
       v-model="isValidForm"
       ref="form"
       class="px-6 pb-8"
@@ -24,7 +33,7 @@
 
         <v-col>
           <v-text-field
-            v-model="license.price"
+            v-model.number="license.price"
             class="mb-2"
             label="Цена"
             type="number"
@@ -81,7 +90,7 @@
       <v-row>
         <v-col>
           <v-text-field
-            v-model.number="license.count_copies"
+            v-model="license.count_copies"
             :model-value="isExclusive ? 'Неограниченно' : license.count_copies"
             :type="isExclusive ? 'text' : 'number'"
             class="mb-2"
@@ -93,7 +102,7 @@
           ></v-text-field>
 
           <v-text-field
-            v-model.number="license.count_streams"
+            v-model="license.count_streams"
             :model-value="isExclusive ? 'Неограниченно' : license.count_streams"
             :type="isExclusive ? 'text' : 'number'"
             class="mb-2"
@@ -107,7 +116,7 @@
 
         <v-col>
           <v-text-field
-            v-model.number="license.count_video_streams"
+            v-model="license.count_video_streams"
             :model-value="isExclusive ? 'Неограниченно' : license.count_video_streams"
             :type="isExclusive ? 'text' : 'number'"
             class="mb-2"
@@ -119,7 +128,7 @@
           ></v-text-field>
 
           <v-text-field
-            v-model.number="license.count_performances"
+            v-model="license.count_performances"
             :model-value="isExclusive ? 'Неограниченно' : license.count_performances"
             :type="isExclusive ? 'text' : 'number'"
             class="mb-2"
@@ -135,11 +144,12 @@
       <v-row>
         <v-spacer></v-spacer>
         <v-btn
-          :disabled="!isValidForm || !license.availableFiles.length || !isDirty"
+          :disabled="!isValidForm || !license.availableFiles.length || !isDirty || isSaving"
           color="orange"
           size="large"
           variant="outlined"
           class="mr-4"
+          @click="save()"
         >
           Сохранить
         </v-btn>
@@ -158,11 +168,12 @@
 </template>
 <script>
 import { useLicenseStore } from '../store/licenseStore';
-import { mapState } from 'pinia';
+import { mapState, mapActions, mapWritableState } from 'pinia';
 
 export default {
   data() {
     return {
+      isSaving: false,
       isValidForm: false,
       license: null,
       licenseScreenshot: null,
@@ -230,23 +241,47 @@ export default {
   },
   computed: {
     ...mapState(useLicenseStore, ['licenses']),
+    ...mapWritableState(useLicenseStore, ['isLicenseLoading']),
     isExclusive() {
       return this.license.type === 'exclusive';
     }
   },
-  created() {
-    this.license = this.licenses.find(v => v.id == this.$route.params.id);
-    this.license.availableFiles = this.license.availableFiles.map(v => {
-      if (v.file_type === this.availableMp3.file_type) {
-        return this.availableMp3;
-      } else if (v.file_type === this.availableWav.file_type) {
-        return this.availableWav;
-      } else if (v.file_type === this.availableTrackout.file_type) {
-        return this.availableTrackout;
+  async created() {
+    try {
+      this.license = await this.getOne(this.$route.params.id);
+
+      console.log(this.license)
+
+      this.license.availableFiles = this.license.availableFiles.map(v => {
+        if (v.file_type === this.availableMp3.file_type) {
+          return this.availableMp3;
+        } else if (v.file_type === this.availableWav.file_type) {
+          return this.availableWav;
+        } else if (v.file_type === this.availableTrackout.file_type) {
+          return this.availableTrackout;
+        }
+      });
+
+      this.licenseScreenshot = JSON.stringify(this.license);
+    } catch (e) {
+      alert(e.response.data.message);
+    } finally {
+      this.isLicenseLoading = false;
+    }
+  },
+  methods: {
+    ...mapActions(useLicenseStore, ['getOne', 'updateLicense']),
+    async save() {
+      try {
+        this.isSaving = true;
+        await this.updateLicense(this.license);
+        this.$router.push('/licenses');
+      } catch (e) {
+        alert(e.response);
+      } finally {
+        this.isSaving = false;
       }
-    });
-    
-    this.licenseScreenshot = JSON.stringify(this.license);
+    }
   }
 }
 </script>

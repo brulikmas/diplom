@@ -47,6 +47,13 @@ export const useLicenseStore = defineStore('licenseStore', {
       } finally {
         this.isLicenseLoading = false;
       }
+    },
+    async getOne(licenseId) {
+      this.isLicenseLoading = true;
+      return await getOne(licenseId);
+    },
+    async updateLicense(postParams) {
+      return await updateLicense(postParams);
     }
   }
 })

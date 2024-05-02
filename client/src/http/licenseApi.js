@@ -1,7 +1,7 @@
 import { $authHost, $host } from './index.js';
 
 export const updateLicense = async (postParams) => {
-  const { data } = await $authHost.post('api/license/', { ...postParams });
+  const { data } = await $authHost.put('api/license/', { ...postParams });
   return data;
 };
 
