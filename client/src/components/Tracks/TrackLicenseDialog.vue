@@ -50,6 +50,7 @@
                 v-for="tl in dialogTrackLicenses"
                 :key="tl.id"
                 :track-license="tl"
+                :track="selectedToCartTrack"
               ></track-license-item>
             </v-expansion-panels>
           </v-card-item>

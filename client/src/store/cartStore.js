@@ -16,6 +16,11 @@ export const useCartStore = defineStore('cartStore', {
     async addToBasket(trackLicense) {
       try {
         let newBasketTl = await addToBasket(trackLicense);
+        
+        if (this.basketItems.find(v => v.id === newBasketTl.id)) {
+          this.basketItems = this.basketItems.filter(v => v.id !== newBasketTl.id)
+        }
+
         this.basketItems.push(newBasketTl);
       } catch (e) {
         alert(e);

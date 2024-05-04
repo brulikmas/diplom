@@ -17,9 +17,9 @@
         class="cart_btn"
         width="100"
         size="small"
-        :slot-scope="isInBasket ? 'mdi-cart-arrow-down' : ''"
+        :slot-scope="isInBasket ? '' : 'mdi-cart-arrow-down'"
         color="orange"
-        @click.stop="addToCart(trackLicense)"
+        @click.stop="addToBasket(trackLicense)"
       >
         {{ isInBasket ? 'В корзине' : trackLicense.custom_price + '₽'}}
       </v-btn>
@@ -45,19 +45,20 @@ export default {
     trackLicense: {
       type: Object,
       default: null,
+    },
+    track: {
+      type: Object,
+      default: null,
     }
   },
   computed: {
     ...mapState(useCartStore, ['basketItems']),
     isInBasket() {
-      return !!this.basketItems.find(v => v.trackLicenseId === this.trackLicense.id);
+      return !!this.basketItems.find(v => (v.trackLicenseId || v.trackLicense.id) === this.trackLicense.id);
     }
   },
   methods: {
     ...mapActions(useCartStore, ['addToBasket']),
-    async addToCart() {
-      
-    }
   }
 }
 </script>

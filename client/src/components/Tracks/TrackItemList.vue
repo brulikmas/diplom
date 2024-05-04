@@ -48,10 +48,12 @@
         class="mr-1"
         icon="mdi-creation"
         variant="text"
+        :color="isUserMarkRating ? 'orange' : ''"
         size="x-small"
+        @click="addOrRemoveRating()"
       ></v-btn>
 
-      <p class="mr-2">{{track.rating}}</p>
+      <p class="mr-2">{{ track.usersRating.length }}</p>
 
       <v-btn
         :disabled="track.userId === user.id"
@@ -72,6 +74,7 @@ import { mapActions, mapState } from 'pinia';
 import { useAudioPlayerStore } from '../../store/audioPlayerStore';
 import { useTrackStore } from '../../store/trackStore';
 import { useUserStore } from '../../store/userStore';
+import ratingMixin from './ratingMixin';
 
 export default {
   data() {
@@ -79,6 +82,7 @@ export default {
       serverUrl: import.meta.env.VITE_API_URL,
     }
   },
+  mixins: [ratingMixin],
   props: {
     track: {
       type: Object,
@@ -106,7 +110,7 @@ export default {
       });
 
       return lowestPrice;
-    }
+    },
   },
   methods: {
     ...mapActions(useAudioPlayerStore, ['play']),

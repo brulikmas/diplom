@@ -154,7 +154,7 @@
         <v-col cols="4">
           <v-img
             :width="300"
-            :src="imgUrl || track.icon || 'src/assets/noimg.jpg'"
+            :src="imgUrl || track.icon && (serverUrl + track.icon) || 'src/assets/noimg.jpg'"
             class="mb-4"
             aspect-ratio="1"
             cover
@@ -217,6 +217,7 @@ export default {
       trackScreenshot: null,
       isDirty: false,
       isSaveLoding: false,
+      serverUrl: import.meta.env.VITE_API_URL,
       track: {
         id: null,
         name: 'Новый бит',
@@ -371,7 +372,7 @@ export default {
         formData.append('mood', this.track.mood);
         formData.append('description', this.track.description);
         formData.append('trackLicenses', JSON.stringify(this.track.trackLicenses));
-        formData.append('icon', this.imgFile.length ? this.imgFile[0] : this.imgFile);
+        formData.append('icon', this.imgFile?.length ? this.imgFile[0] : this.imgFile);
   
         for (let key in this.audioFiles) {
           let audioFile = this.audioFiles[key];

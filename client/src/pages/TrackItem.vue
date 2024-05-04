@@ -53,9 +53,11 @@
               icon="mdi-creation"
               variant="text"
               size="x-small"
+              :color="isUserMarkRating ? 'orange' : ''"
+              @click="addOrRemoveRating()"
             ></v-btn>
   
-            <p class="mr-2">{{track.rating}}</p>
+            <p class="mr-2">{{ track.usersRating.length }}</p>
           </v-card-actions>
         </div>
       </div>
@@ -79,7 +81,9 @@
 </template>
 <script>
 import { useTrackStore } from '../store/trackStore';
+import { useUserStore } from '../store/userStore';
 import { mapState, mapActions, mapWritableState } from 'pinia';
+import ratingMixin from '../components/Tracks/ratingMixin';
 export default {
   data() {
     return {
@@ -87,8 +91,10 @@ export default {
       serverUrl: import.meta.env.VITE_API_URL,
     }
   },
+  mixins: [ratingMixin],
   computed: {
     ...mapState(useTrackStore, ['tracks']),
+    ...mapState(useUserStore, ['user']),
     ...mapWritableState(useTrackStore, ['isTrackLoading']),
     getLowestPrice() {
       let lowestPrice = this.track.trackLicenses[0].custom_price;

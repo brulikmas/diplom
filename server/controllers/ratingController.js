@@ -27,6 +27,16 @@ class RatingController {
       next(ApiError.badRequest(e.message));
     }
   }
+
+  async getOne(req, res, next) {
+    try {
+      const { trackId } = req.params;
+      const userRating = Rating.findOne({ where: { trackId, userId: req.user.id }});
+      return res.json(userRating);
+    } catch (e) {
+      next(ApiError.badRequest(e.message));
+    }
+  }
 }
 
 module.exports = new RatingController();

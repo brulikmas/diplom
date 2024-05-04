@@ -1,6 +1,6 @@
 const uuid = require('uuid');
 const path = require('path');
-const { Track, File, TrackLicense, PurchaseItem, User, License, AvailableFile } = require('../models/models');
+const { Track, File, TrackLicense, PurchaseItem, User, License, AvailableFile, Rating } = require('../models/models');
 const ApiError = require('../error/ApiError');
 const fs = require('fs');
 const { Op } = require('sequelize');
@@ -23,10 +23,13 @@ class TrackController {
           file: trackout
         }
       ];
+      console.log(req.files)
       let iconName = uuid.v4() + '.jpeg';
       let mp3tagName = uuid.v4() + '.mp3';
       icon?.mv(path.resolve(__dirname, '..', 'static', iconName));
       mp3tag.mv(path.resolve(__dirname, '..', 'static', mp3tagName));
+      
+
 
       let user = await User.findOne({ where: { id: req.user.id } });
 
@@ -58,6 +61,7 @@ class TrackController {
       fs.mkdirSync(dirPath);
 
       files.forEach(v => {
+        console.log(v.file)
         let path = dirPath + `\\${v.file.name}`;
         v.file?.mv(path);
         File.create({ trackId: track.id, type: v.type, path })
@@ -66,6 +70,7 @@ class TrackController {
 
       return res.json(track);
     } catch (e) {
+      console.log(e)
       next(ApiError.badRequest(e.message));
     }
   }
@@ -109,11 +114,17 @@ class TrackController {
           where: whereConditions,
           limit,
           offset,
-          include: [{ 
-            model: TrackLicense, 
-            as: "trackLicenses",
-            where: { is_visible: true },
-          }],
+          include: [
+            { 
+              model: TrackLicense, 
+              as: "trackLicenses",
+              where: { is_visible: true },
+            },
+            {
+              model: Rating,
+              as: "usersRating",
+            }
+          ],
           distinct: true
         });
       }
@@ -123,11 +134,17 @@ class TrackController {
           where: { userId, is_visible: true }, 
           limit, 
           offset,
-          include: [{ 
-            model: TrackLicense, 
-            as: "trackLicenses",
-            where: { is_visible: true },
-          }],
+          include: [
+            { 
+              model: TrackLicense, 
+              as: "trackLicenses",
+              where: { is_visible: true },
+            },
+            {
+              model: Rating,
+              as: "usersRating",
+            }
+          ],
           distinct: true
         });
       }
@@ -142,7 +159,17 @@ class TrackController {
     const { id } = req.params;
     const track = await Track.findOne({ 
       where: { id, is_visible: true },
-      include: [{ model: TrackLicense, as: "trackLicenses", where: { is_visible: true } }],
+      include: [
+        { 
+          model: TrackLicense, 
+          as: "trackLicenses", 
+          where: { is_visible: true } 
+        },
+        {
+          model: Rating,
+          as: "usersRating",
+        }
+      ],
     });
     return res.json(track);
   }
@@ -233,6 +260,7 @@ class TrackController {
           file: trackout
         }
       ];
+      console.log(req.files)
       let iconName = uuid.v4() + '.jpeg';
       let mp3tagName = uuid.v4() + '.mp3';
       icon?.mv(path.resolve(__dirname, '..', 'static', iconName));
@@ -288,10 +316,11 @@ class TrackController {
   
         for (let v of files) {
           if (v.file) {
+            console.log(v)
             let path = dirPath + `\\${v.file.name}`;
             let previosFile = await File.findOne({ where: { trackId: track.id, type: v.type } });
 
-            fs.unlinkSync(previosFile.path);
+            fs.unlinkSync(previosFile?.path);
             File.destroy({ where: { trackId: track.id, type: v.type } });
             v.file?.mv(path);
             File.create({ trackId: track.id, type: v.type, path });

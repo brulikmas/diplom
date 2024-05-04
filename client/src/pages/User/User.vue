@@ -7,7 +7,7 @@
         <v-img
           aspect-ratio="1"
           cover
-          :src="user.avatar || '/src/assets/noavatar.jpg'"
+          :src="user.avatar && (serverUrl + user.avatar) || '/src/assets/noavatar.jpg'"
           rounded="lg"
         ></v-img>
       </v-avatar>
@@ -60,6 +60,11 @@ import { useUserStore } from '../../store/userStore';
 import { mapState, mapWritableState } from 'pinia';
 
 export default {
+  data() {
+    return {
+      serverUrl: import.meta.env.VITE_API_URL,
+    }
+  },
   computed: {
     ...mapState(useUserStore, ['user']),
     ...mapWritableState(useUserStore, ['userTab']),

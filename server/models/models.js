@@ -90,7 +90,7 @@ PurchaseItem.belongsTo(User);
 User.hasMany(License);
 License.belongsTo(User);
 
-Track.hasMany(Rating);
+Track.hasMany(Rating, { as: 'usersRating' });
 Rating.belongsTo(Track);
 
 Track.hasMany(File, { as: 'files' });

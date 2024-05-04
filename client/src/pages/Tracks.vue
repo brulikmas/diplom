@@ -19,6 +19,7 @@
 import TrackList from '../components/Tracks/TrackList.vue';
 import FiltersForm from '../components/filters/FiltersForm.vue';
 import { useTrackStore } from '../store/trackStore';
+import { useCartStore } from '../store/cartStore';
 import { mapState, mapActions } from 'pinia';
 
 export default {
@@ -30,10 +31,14 @@ export default {
     ...mapState(useTrackStore, ['tracks', 'isTrackLoading']),
   },
   methods: {
-    ...mapActions(useTrackStore, ['getAll'])
+    ...mapActions(useTrackStore, ['getAll']),
+    ...mapActions(useCartStore, {
+      getAllBasketTl: 'getAll',
+    }),
   },
   created() {
     this.getAll();
+    this.getAllBasketTl(); 
   }
 }
 </script>
