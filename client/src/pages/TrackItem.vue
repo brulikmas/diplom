@@ -43,7 +43,7 @@
               prepend-icon="mdi-cart-arrow-down"
               color="orange"
               variant="elevated"
-              @click="openTlDialog(track.id)"
+              @click="openDialog()"
             >
               {{getLowestPrice}} ₽
             </v-btn>
@@ -94,7 +94,7 @@ export default {
   mixins: [ratingMixin],
   computed: {
     ...mapState(useTrackStore, ['tracks']),
-    ...mapState(useUserStore, ['user']),
+    ...mapState(useUserStore, ['user', 'isAuth']),
     ...mapWritableState(useTrackStore, ['isTrackLoading']),
     getLowestPrice() {
       let lowestPrice = this.track.trackLicenses[0].custom_price;
@@ -125,6 +125,14 @@ export default {
         alert(e.response.data.message);
       } finally {
         this.isTrackLoading = false;
+      }
+    },
+    openDialog() {
+      if (this.isAuth) {
+        this.openTlDialog(this.track.id)
+      } else {
+        this.$router.push('/login');
+        return;
       }
     }
   },

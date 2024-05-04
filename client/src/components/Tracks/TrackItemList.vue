@@ -62,7 +62,7 @@
         size="small"
         prepend-icon="mdi-cart-arrow-down"
         color="orange"
-        @click="openTlDialog(track.id)"
+        @click="openDialog()"
       >
         {{getLowestPrice}} ₽
       </v-btn>
@@ -92,7 +92,7 @@ export default {
   },
   computed: {
     ...mapState(useAudioPlayerStore, ['currentTrack', 'isPlaying']),
-    ...mapState(useUserStore, ['user']),
+    ...mapState(useUserStore, ['user', 'isAuth']),
     getPlayIcon() {
       if (this.track.id !== this.currentTrack?.id) {
         return 'mdi-play';
@@ -115,6 +115,14 @@ export default {
   methods: {
     ...mapActions(useAudioPlayerStore, ['play']),
     ...mapActions(useTrackStore, ['openTlDialog']),
+    openDialog() {
+      if (this.isAuth) {
+        this.openTlDialog(track.id)
+      } else {
+        this.$router.push('/login');
+        return;
+      }
+    }
   }
 }
 </script>

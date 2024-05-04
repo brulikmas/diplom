@@ -31,7 +31,8 @@
       <v-tabs
         v-model="userTab"
       >
-        <v-tab 
+        <v-tab
+          v-if="user.role === 'BEATMAKER'"
           to="/user/balance" 
           value="balance"
         >

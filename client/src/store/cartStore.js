@@ -30,7 +30,11 @@ export const useCartStore = defineStore('cartStore', {
       try {
         this.basketItems = await getAll();
       } catch (e) {
-        alert(e);
+        if (e?.response?.status === 401) {
+          console.log(e.response.data.message);
+        } else {
+          alert(e);
+        }
       }
     },
     async deleteFromBasket(id) {

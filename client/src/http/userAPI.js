@@ -28,3 +28,8 @@ export const updateUser = async (user) => {
   const { data } = await $authHost.put('api/user/', user);
   return data;
 };
+
+export const getBalance = async () => {
+  const { data } = await $authHost.get('api/user');
+  return data;
+};
