@@ -77,8 +77,9 @@
               variant="outlined"
               color="orange"
               block
+              @click="buy()"
             >
-              Оплатить
+              {{ isBuyingLoading ? 'Оплата...' : 'Оплатить'}}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -87,16 +88,18 @@
   </div>
 </template>
 <script>
-import { mapState, mapActions } from 'pinia';
+import { mapState, mapActions, mapWritableState } from 'pinia';
 import { useCartStore } from '../store/cartStore';
 import LicenseInfo from '../components/Licenses/LicenseInfo.vue';
 import AvailableFiles from '../components/Licenses/AvailableFiles.vue';
+import { createPurchaseItem } from '../http/purchaseApi.js';
 
 export default {
   data() {
     return {
       serverUrl: import.meta.env.VITE_API_URL,
       isLoading: false,
+      isBuyingLoading: false,
     }
   },
   components: {
@@ -104,10 +107,30 @@ export default {
     AvailableFiles,
   },
   computed: {
-    ...mapState(useCartStore, ['basketItems', 'totalSum']),
+    ...mapState(useCartStore, ['totalSum']),
+    ...mapWritableState(useCartStore, ['basketItems']),
   },
   methods: {
     ...mapActions(useCartStore, ['deleteFromBasket', 'getAll']),
+    async buy() {
+      try {
+        this.isBuyingLoading = true;
+
+        for (let basketTl of this.basketItems) {
+          await createPurchaseItem({
+            trackLicense: basketTl.trackLicense,
+            beatmakerId: basketTl.beatmaker.id,
+            basketId: basketTl.basketId,
+          })
+        }
+
+        this.basketItems = [];
+      } catch (e) {
+        alert(e)
+      } finally {
+        this.isBuyingLoading = false;
+      }
+    }
   },
   async created() {
     try {

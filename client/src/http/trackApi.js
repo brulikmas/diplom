@@ -12,12 +12,10 @@ export const updateTrack = async (track) => {
 
 export const getAll = async (params) => {
   const { data } = await $host.get(`api/track`, { params });
-  console.log(data)
   return data;
 };
 
 export const getOne = async (trackId) => {
-  console.log(trackId)
   const { data } = await $host.get(`api/track/${trackId}`);
   return data;
 };

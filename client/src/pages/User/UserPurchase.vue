@@ -1,5 +1,12 @@
 <template>
-  <div class="mt-4">
+  <div v-if="isLoading">
+    Загрузка...
+  </div>
+
+  <div
+    v-else 
+    class="mt-4"
+  >
     <v-expansion-panels>
       <v-expansion-panel
         v-for="purchase in purchases"
@@ -12,7 +19,7 @@
               :width="50"
               aspect-ratio="1"
               cover
-              :src="purchase.track.icon"
+              :src="serverUrl + purchase.track.icon"
               rounded="lg"
             ></v-img>
 
@@ -31,10 +38,10 @@
             size="large"
             variant="outlined"
             class="mr-2"
-            @click.stop=""
+            @click.stop="downloadFile(purchase, file)"
           >{{ file.type }}</v-btn>
 
-          <p class="mr-2">{{purchase.trackLicense.custom_price}} ₽</p>
+          <p class="mr-2">{{ purchase.trackLicense.custom_price }} ₽</p>
         </v-expansion-panel-title>
 
         <v-expansion-panel-text>
@@ -57,10 +64,11 @@
   </div>
 </template>
 <script>
-import { mapState } from 'pinia';
+import { mapWritableState } from 'pinia';
 import { usePurchaseStore } from '../../store/purchaseStore';
 import LicenseInfo from '../../components/Licenses/LicenseInfo.vue';
 import AvailableFiles from '../../components/Licenses/AvailableFiles.vue';
+import { getAll } from '../../http/purchaseApi.js';
 
 const filesOrder = {
   mp3: 0,
@@ -69,12 +77,18 @@ const filesOrder = {
 }
 
 export default {
+  data() {
+    return {
+      isLoading: false,
+      serverUrl: import.meta.env.VITE_API_URL,
+    }
+  },
   components: {
     LicenseInfo,
     AvailableFiles,
   },
   computed: {
-    ...mapState(usePurchaseStore, ['purchases']),
+    ...mapWritableState(usePurchaseStore, ['purchases']),
   },
   methods: {
     sortFilesByType(files) {
@@ -83,10 +97,46 @@ export default {
         const typeNumber2 =  filesOrder[b.type];
         return typeNumber1 - typeNumber2;
       });
+    },
+    async downloadFile(purchase, file) {
+      try {
+        const response = await fetch(
+          `${this.serverUrl}api/track/download?purchaseId=${purchase.id}&filePath=${file.path}&fileType=${file.type}`, 
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            },
+          }
+        );
+        
+        if (response.status === 200) {
+          let splitArray = file.path.split('\\');
+          let fileName = splitArray[splitArray.length - 1];
+
+          const blob = await response.blob();
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = downloadUrl;
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+        }
+      } catch (e) {
+        alert(e)
+      }
     }
   },
-  created() {
-    this.purchases.forEach(p => this.sortFilesByType(p.track.files));
+  async created() {
+    try {
+      this.isLoading = true;
+      this.purchases = (await getAll()).rows;
+      this.purchases.forEach(p => this.sortFilesByType(p.track.files));
+    } catch (e) {
+      alert(e)
+    } finally {
+      this.isLoading = false;
+    }
   }
 }
 </script>

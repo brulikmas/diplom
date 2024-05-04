@@ -343,8 +343,6 @@ class TrackController {
         where: { id: req.user.id }, 
         include: [{ model: PurchaseItem, as: 'purchaseItems'}]
       });
-      console.log(purchaseId)
-      console.log(user)
 
       if (user.purchaseItems.find(v => v.id == purchaseId)) {
         const purchaseItem = await PurchaseItem.findOne({ where: { id: purchaseId }});
