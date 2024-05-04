@@ -13,14 +13,15 @@
       <v-spacer></v-spacer>
 
       <v-btn
+        :disabled="isInBasket"
         class="cart_btn"
         width="100"
         size="small"
-        prepend-icon="mdi-cart-arrow-down"
+        :slot-scope="isInBasket ? 'mdi-cart-arrow-down' : ''"
         color="orange"
-        @click.stop=""
+        @click.stop="addToCart(trackLicense)"
       >
-        {{ trackLicense.custom_price }} ₽
+        {{ isInBasket ? 'В корзине' : trackLicense.custom_price + '₽'}}
       </v-btn>
     </v-expansion-panel-title>
 
@@ -32,6 +33,8 @@
 <script>
 import AvailableFiles from '../Licenses/AvailableFiles.vue';
 import LicenseInfo from '../Licenses/LicenseInfo.vue';
+import { useCartStore } from '../../store/cartStore';
+import { mapActions, mapState } from 'pinia';
 
 export default {
   components: {
@@ -42,6 +45,18 @@ export default {
     trackLicense: {
       type: Object,
       default: null,
+    }
+  },
+  computed: {
+    ...mapState(useCartStore, ['basketItems']),
+    isInBasket() {
+      return !!this.basketItems.find(v => v.trackLicenseId === this.trackLicense.id);
+    }
+  },
+  methods: {
+    ...mapActions(useCartStore, ['addToBasket']),
+    async addToCart() {
+      
     }
   }
 }

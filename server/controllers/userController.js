@@ -157,7 +157,7 @@ class UserController {
   async update(req, res, next) {
     try {
       const { name, surname, country, info, nickname } = req.body;
-      const { avatar } = req.files;
+      const avatar = req.files?.avatar;
       
       let avatarName = uuid.v4() + '.jpeg';
       avatar?.mv(path.resolve(__dirname, '..', 'static', avatarName));

@@ -19,7 +19,7 @@
           :width="50"
           aspect-ratio="1"
           cover
-          :src="track.icon"
+          :src="serverUrl + track.icon"
           rounded="lg"
         ></v-img>
       </v-list-item-media>    
@@ -54,6 +54,7 @@
       <p class="mr-2">{{track.rating}}</p>
 
       <v-btn
+        :disabled="track.userId === user.id"
         class="cart_btn"
         width="100"
         size="small"
@@ -70,8 +71,14 @@
 import { mapActions, mapState } from 'pinia';
 import { useAudioPlayerStore } from '../../store/audioPlayerStore';
 import { useTrackStore } from '../../store/trackStore';
+import { useUserStore } from '../../store/userStore';
 
 export default {
+  data() {
+    return {
+      serverUrl: import.meta.env.VITE_API_URL,
+    }
+  },
   props: {
     track: {
       type: Object,
@@ -81,6 +88,7 @@ export default {
   },
   computed: {
     ...mapState(useAudioPlayerStore, ['currentTrack', 'isPlaying']),
+    ...mapState(useUserStore, ['user']),
     getPlayIcon() {
       if (this.track.id !== this.currentTrack?.id) {
         return 'mdi-play';

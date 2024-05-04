@@ -29,7 +29,7 @@
               :width="50"
               aspect-ratio="1"
               cover
-              :src="track.icon"
+              :src="serverUrl + track.icon"
               rounded="lg"
             ></v-img>
           </v-list-item-media>   
@@ -58,6 +58,7 @@
           icon="mdi-delete"
           color="red"
           variant="text"
+          @click="deleteTrack(track.id)"
         ></v-btn>
       </template>
       </v-list-item>
@@ -70,12 +71,25 @@ import { useUserStore } from '../store/userStore';
 import { mapState, mapActions } from 'pinia';
 
 export default {
+  data() {
+    return {
+      serverUrl: import.meta.env.VITE_API_URL,
+    }
+  },
   computed: {
     ...mapState(useTrackStore, ['tracks', 'isTrackLoading']),
     ...mapState(useUserStore, ['user']),
   },
   methods: {
-    ...mapActions(useTrackStore, ['getAll']),
+    ...mapActions(useTrackStore, ['getAll', 'deleteTrack']),
+    // async deleteTrackById(trackId) {
+    //   try {
+    //     await this.deleteTrackById(trackId);
+        
+    //   } catch (e) {
+    //     alert(e.response.data.message);
+    //   }
+    // }
   },
   created() {
     this.getAll({ userId: this.user.id });

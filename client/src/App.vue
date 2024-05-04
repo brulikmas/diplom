@@ -23,13 +23,14 @@
   </v-layout>
 </template>
 <script>
-import { mapState, mapWritableState } from 'pinia';
+import { mapActions, mapState, mapWritableState } from 'pinia';
 import BottomAudioSheet from './components/BottomAudioSheet.vue';
 import NavBar from './components/NavBar.vue';
 import NavDrawer from './components/NavDrawer.vue';
 import TrackLicensecDialog from './components/Tracks/TrackLicenseDialog.vue';
 import { useAudioPlayerStore } from './store/audioPlayerStore';
 import { useUserStore } from './store/userStore';
+import { useCartStore } from './store/cartStore';
 import { check, getUser } from './http/userAPI';
 
 
@@ -50,10 +51,14 @@ export default {
     ...mapState(useAudioPlayerStore, ['isAudioBottomSheetOpen']),
     ...mapWritableState(useUserStore, ['user', 'isAuth']),
   },
+  methods: {
+    ...mapActions(useCartStore, ['getAll']),
+  },
   async created() {
     try {
       let userAfterCheck = await check();
       this.user = await getUser(userAfterCheck.id);
+      await this.getAll();
       this.isAuth = true;
     } finally {
       this.isLoading = false;

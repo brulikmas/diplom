@@ -28,6 +28,12 @@ export const useAudioPlayerStore = defineStore('audioPlayerStore', {
       const currentIndex = trackStore.tracks.findIndex(v => v.id === this.currentTrack.id);
       const tracksLength = trackStore.tracks.length;
 
+      if (currentIndex === -1) {
+        tracksLength
+          ? this.play(trackStore.tracks[0], true)
+          : this.play(currentTrack, true)
+      }
+
       if (direction === 'previous') {
         currentIndex - 1 < 0 
           ? this.play(trackStore.tracks[tracksLength - 1], true)

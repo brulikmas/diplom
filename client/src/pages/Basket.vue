@@ -2,7 +2,11 @@
   <div class="mt-4" style="width: 80%">
     <h1>Корзина</h1>
     
-    <v-row>
+    <div v-if="isLoading">
+      Загрузка...
+    </div>
+
+    <v-row v-else>
       <v-col cols="8">
         <v-expansion-panels>
           <v-expansion-panel
@@ -16,7 +20,7 @@
                   :width="50"
                   aspect-ratio="1"
                   cover
-                  :src="item.track.icon"
+                  :src="serverUrl + item.track.icon"
                   rounded="lg"
                 ></v-img>
     
@@ -34,7 +38,7 @@
                 color="red"
                 size="small"
                 variant="text"
-                @click.stop=""
+                @click.stop="deleteFromBasket(item.id)"
               ></v-btn>
             </v-expansion-panel-title>
     
@@ -69,6 +73,7 @@
 
           <v-card-actions>
             <v-btn
+              :disabled="totalSum === 0"
               variant="outlined"
               color="orange"
               block
@@ -82,12 +87,18 @@
   </div>
 </template>
 <script>
-import { mapState } from 'pinia';
+import { mapState, mapActions } from 'pinia';
 import { useCartStore } from '../store/cartStore';
 import LicenseInfo from '../components/Licenses/LicenseInfo.vue';
 import AvailableFiles from '../components/Licenses/AvailableFiles.vue';
 
 export default {
+  data() {
+    return {
+      serverUrl: import.meta.env.VITE_API_URL,
+      isLoading: false,
+    }
+  },
   components: {
     LicenseInfo,
     AvailableFiles,
@@ -96,9 +107,17 @@ export default {
     ...mapState(useCartStore, ['basketItems', 'totalSum']),
   },
   methods: {
+    ...mapActions(useCartStore, ['deleteFromBasket', 'getAll']),
   },
-  created() {
-    
+  async created() {
+    try {
+      this.isLoading = true;
+      await this.getAll();
+    } catch (e) {
+      alert(e);
+    } finally {
+      this.isLoading = false;
+    }
   }
 }
 </script>

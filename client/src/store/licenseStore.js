@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { getAll, getOne, updateLicense } from '../http/licenseApi';
+import { deleteTrack } from '../http/trackApi';
 const licenseOrder = {
   base: 0,
   premium: 1,
@@ -54,6 +55,6 @@ export const useLicenseStore = defineStore('licenseStore', {
     },
     async updateLicense(postParams) {
       return await updateLicense(postParams);
-    }
+    },
   }
 })

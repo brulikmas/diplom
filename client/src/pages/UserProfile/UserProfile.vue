@@ -1,5 +1,10 @@
 <template>
+  <div v-if="isLoading">
+    Загрузка...
+  </div>
+
   <v-card
+    v-else
     class="userProfile_card mt-6"
   >
     <template #prepend>
@@ -8,7 +13,7 @@
           aspect-ratio="1"
           cover
           :width="250"
-          :src="checkingUserProfile.avatar || '/src/assets/noavatar.jpg'"
+          :src="serverUrl + checkingUserProfile.avatar || '/src/assets/noavatar.jpg'"
           rounded="lg"
         ></v-img>
       </v-avatar>
@@ -58,20 +63,45 @@
   </v-card>
 </template>
 <script>
-import { useTrackStore } from '../../store/trackStore';
+import { getUser } from '../../http/userAPI';
+import { mapWritableState, mapActions } from 'pinia';
 import { useUserStore } from '../../store/userStore';
-import { mapState, mapActions } from 'pinia';
+import { useLicenseStore } from '../../store/licenseStore';
+
 export default {
   data() {
     return {
       tab: 'info',
+      isLoading: false,
+      serverUrl: import.meta.env.VITE_API_URL,
     }
   },
   computed: {
-    ...mapState(useUserStore, ['checkingUserProfile']),
+    ...mapWritableState(useUserStore, ['checkingUserProfile'])
+  },
+  async created() {
+    this.initCheckingUserProfile();
   },
   methods: {
-
+    ...mapActions(useLicenseStore, ['getAll']),
+    async initCheckingUserProfile() {
+      try {
+        this.isLoading = true
+        this.checkingUserProfile = await getUser(this.$route.params.id);
+        await this.getAll(this.checkingUserProfile.id);
+      } catch (e) {
+        alert(e.response.data.message);
+      } finally {
+        this.isLoading = false;
+      }
+    }
+  },
+  watch: {
+    '$route.params.id': {
+      async handler() {
+        this.initCheckingUserProfile();
+      }
+    }
   }
 }
 </script>

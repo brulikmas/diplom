@@ -15,7 +15,7 @@
             aspect-ratio="1"
             cover
             :width="250"
-            :src="imgUrl || user.avatar || '/src/assets/noavatar.jpg'"
+            :src="imgUrl || user.avatar && (serverUrl + user.avatar) || '/src/assets/noavatar.jpg'"
             rounded="lg"
           ></v-img>
         </v-avatar>
@@ -35,7 +35,7 @@
 
       <v-col cols="8">
         <v-text-field
-          v-model="user.nickname"
+          v-model="copiedUser.nickname"
           class="mb-2"
           label="Никнейм"
           placeholder="Введите никнейм"
@@ -44,7 +44,7 @@
         ></v-text-field>
     
         <v-text-field
-          v-model="user.name"
+          v-model="copiedUser.name"
           class="mb-2"
           label="Имя"
           placeholder="Введите имя"
@@ -53,7 +53,7 @@
         ></v-text-field>
     
         <v-text-field
-          v-model="user.surname"
+          v-model="copiedUser.surname"
           class="mb-2"
           label="Фамилия"
           placeholder="Введите фамилию"
@@ -62,7 +62,7 @@
         ></v-text-field>
     
         <v-text-field
-          v-model="user.country"
+          v-model="copiedUser.country"
           label="Страна"
           placeholder="Введите страну"
           clearable
@@ -70,7 +70,7 @@
         ></v-text-field>
 
         <v-text-field
-          v-model="user.info"
+          v-model="copiedUser.info"
           label="Информация"
           placeholder="Введите информацию о вас"
           clearable
@@ -78,11 +78,12 @@
         ></v-text-field>
     
         <v-btn
-          :disabled="!isValidForm || !(isFilesChanged || isDirty)"
+          :disabled="!isValidForm || !(isFilesChanged || isDirty) || isSaveLoading"
           color="orange"
           size="large"
           variant="outlined"
           block
+          @click="save()"
         >
           Сохранить
         </v-btn>
@@ -91,16 +92,20 @@
   </v-form>
 </template>
 <script>
-import { mapState } from 'pinia';
+import { mapWritableState } from 'pinia';
 import { useUserStore } from '../../store/userStore';
+import { updateUser, getUser } from '../../http/userAPI';
 
 export default {
   data() {
     return {
+      serverUrl: import.meta.env.VITE_API_URL,
+      copiedUser: null,
       isValidForm: false,
       imgFile: null,
       isDirty: false,
       userScreenshot: null,
+      isSaveLoading: false,
       nickNameRules: [
         value => {
           if (value) return true;
@@ -120,6 +125,8 @@ export default {
       ],
       simpleFieldsRules: [
         value => {
+          if (!value) return true;
+
           if (value?.length < 55) return true;
 
           return 'Количество символов должно быть меньше 55!';
@@ -128,7 +135,7 @@ export default {
     }
   },
   watch: {
-    user: {
+    copiedUser: {
       handler(newValue) {
         if (this.userScreenshot !== JSON.stringify(newValue)) {
           this.isDirty = true;
@@ -140,7 +147,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(useUserStore, ['user']),
+    ...mapWritableState(useUserStore, ['user']),
     imgUrl() {
       if (!this.imgFile) return;
 
@@ -152,16 +159,53 @@ export default {
         return URL.createObjectURL(this.imgFile);
       }
     },
-    isFilesChanged() {
-      if ((this.imgFile && this.imgFile?.length === undefined) || (this.imgFile?.length && this.imgFile?.length !== 0)) {
-        return true;
+    isFilesChanged: {
+      get() {
+        if ((this.imgFile && this.imgFile?.length === undefined) || (this.imgFile?.length && this.imgFile?.length !== 0)) {
+          return true;
+        }
+  
+        return false;
+      },
+      set(newValue) {
+        if (!newValue) {
+          this.imgFile = null;
+        }
       }
-
-      return false;
     }
   },
   created() {
-    this.userScreenshot = JSON.stringify(this.user);
+    this.copiedUser = JSON.parse(JSON.stringify(this.user, (key, value) => {
+      return value ? value : '';
+    }));
+    this.userScreenshot = JSON.stringify(this.copiedUser);
+  },
+  methods: {
+    async save() {
+      try {
+        this.isSaveLoading = true;
+        const formData = new FormData();
+  
+        formData.append('name', this.copiedUser.name);
+        formData.append('surname', this.copiedUser.surname);
+        formData.append('country', this.copiedUser.country);
+        formData.append('info', this.copiedUser.info);
+        formData.append('nickname', this.copiedUser.nickname);
+  
+        formData.append('avatar',  this.imgFile?.length ? this.imgFile[0] : this.imgFile);
+  
+        await updateUser(formData);
+        this.user = await getUser(this.user.id);
+        this.copiedUser = this.user;
+        this.userScreenshot = JSON.stringify(this.copiedUser);
+        this.isDirty = false;
+        this.isFilesChanged = false;
+      } catch (e) {
+        alert(e.response.data.message);
+      } finally {
+        this.isSaveLoading = false;
+      }
+    }
   }
 }
 </script>

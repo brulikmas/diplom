@@ -1,17 +1,14 @@
 import { $authHost, $host } from './index.js';
-import { jwtDecode }  from 'jwt-decode';
 
-export const registration = async (email, password, nickname, role) => {
-  const { data } = await $host.post('api/user/registration', { email, password, nickname, role });
-  localStorage.setItem('token', data.token);
-  return jwtDecode(data.token);
+export const createTrack = async (track) => {
+  const { data } = await $authHost.post('api/track', track);
+  return data;
 };
 
-// export const create = async (email, password) => {
-//   const { data } = await $host.post('api/user/login', { email, password });
-//   localStorage.setItem('token', data.token);
-//   return jwtDecode(data.token);
-// };
+export const updateTrack = async (track) => {
+  const { data } = await $authHost.put('api/track', track);
+  return data;
+};
 
 export const getAll = async (params) => {
   const { data } = await $host.get(`api/track`, { params });

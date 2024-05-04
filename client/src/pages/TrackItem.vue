@@ -12,23 +12,23 @@
         :width="250"
         aspect-ratio="1"
         cover
-        :src="tracks[0].icon"
+        :src="serverUrl + track.icon"
         rounded="lg"
       ></v-img>
 
       <div class="d-flex flex-column justify-space-between ml-4 mt-2">
         <div>
           <v-card-title>
-            <h1>{{ tracks[0].name }}</h1>
+            <h1>{{ track.name }}</h1>
           </v-card-title>
 
           <v-card-subtitle class="mt-2">
             <h2>
               <router-link 
-                :to="`/userProfile/${tracks[0].userId}`"
+                :to="`/userProfile/${track.userId}`"
                 class="link"
               >
-                {{ tracks[0].userNickname }}
+                {{ track.userNickname }}
               </router-link>
             </h2>
           </v-card-subtitle>
@@ -43,7 +43,7 @@
               prepend-icon="mdi-cart-arrow-down"
               color="orange"
               variant="elevated"
-              @click="openTlDialog(tracks[0].id)"
+              @click="openTlDialog(track.id)"
             >
               {{getLowestPrice}} ₽
             </v-btn>
@@ -55,7 +55,7 @@
               size="x-small"
             ></v-btn>
   
-            <p class="mr-2">{{tracks[0].rating}}</p>
+            <p class="mr-2">{{track.rating}}</p>
           </v-card-actions>
         </div>
       </div>
@@ -69,24 +69,31 @@
       ></v-divider>
 
       <h2 style="font-size: 28px;">О треке:</h2>
-      <p class="mt-4">Bpm: {{ tracks[0].bpm }}</p>
-      <p>Тональность: {{ tracks[0].tonality }}</p>
-      <p>Жанр: {{ tracks[0].genre }}</p>
-      <p>Настроение: {{ tracks[0].mood }}</p>
-      <p>Описание: {{ tracks[0].description }}</p>
+      <p class="mt-4">Bpm: {{ track.bpm }}</p>
+      <p>Тональность: {{ track.tonality }}</p>
+      <p>Жанр: {{ track.genre }}</p>
+      <p>Настроение: {{ track.mood }}</p>
+      <p>Описание: {{ track.description }}</p>
     </v-card-text>
   </v-card>
 </template>
 <script>
 import { useTrackStore } from '../store/trackStore';
-import { mapState, mapActions } from 'pinia';
+import { mapState, mapActions, mapWritableState } from 'pinia';
 export default {
+  data() {
+    return {
+      track: null,
+      serverUrl: import.meta.env.VITE_API_URL,
+    }
+  },
   computed: {
-    ...mapState(useTrackStore, ['tracks', 'isTrackLoading']),
+    ...mapState(useTrackStore, ['tracks']),
+    ...mapWritableState(useTrackStore, ['isTrackLoading']),
     getLowestPrice() {
-      let lowestPrice = this.tracks[0].trackLicenses[0].custom_price;
+      let lowestPrice = this.track.trackLicenses[0].custom_price;
 
-      this.tracks[0].trackLicenses.forEach(tl => {
+      this.track.trackLicenses.forEach(tl => {
         if (tl.custom_price < lowestPrice) {
           lowestPrice = tl.custom_price;
         }
@@ -95,11 +102,28 @@ export default {
       return lowestPrice;
     }
   },
+  watch: {
+    '$route.params.id': {
+      handler() {
+        this.initTrack();
+      }
+    }
+  },
   methods: {
     ...mapActions(useTrackStore, ['openTlDialog', 'getOne']),
+    async initTrack() {
+      try {
+        this.isTrackLoading = true;
+        this.track = await this.getOne(this.$route.params.id);
+      } catch (e) {
+        alert(e.response.data.message);
+      } finally {
+        this.isTrackLoading = false;
+      }
+    }
   },
-  created() {
-    this.getOne(this.$route.params.id);
+  async created() {
+    this.initTrack();
   }
 }
 </script>

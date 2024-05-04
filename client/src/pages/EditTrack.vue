@@ -1,7 +1,13 @@
 <template>
   <v-card class="mt-6" style="width: 80%; background: none;">
     <v-card-title class="px-6 mb-4"><h2>Редактирование трека</h2></v-card-title>
+    
+    <div v-if="isTrackLoading">
+      Загрузка...
+    </div>
+
     <v-form
+      v-else
       v-model="isValidForm"
       ref="form"
       class="pl-6 pb-8"
@@ -12,10 +18,10 @@
           <h3>Mp3 файл с войстегом для воспроизведения</h3>
 
           <v-file-input
-            v-model="audioFiles.mp3Tag.file"
+            v-model="audioFiles.mp3tag.file"
             class="mt-4"
             accept="audio/mp3"
-            :label="getText('mp3Tag')"
+            :label="getText('mp3tag')"
             base-color="orange"
             variant="outlined"
             prepend-inner-icon="mdi-music"
@@ -170,7 +176,7 @@
 
       <v-row>
         <v-btn
-          :disabled="!isValidForm || !(isFilesChanged || isDirty)"
+          :disabled="!isValidForm || !(isFilesChanged || isDirty) || isSaveLoding"
           color="orange"
           size="large"
           variant="outlined"
@@ -196,8 +202,9 @@
 <script>
 import { useTrackStore } from '../store/trackStore';
 import { useLicenseStore } from '../store/licenseStore';
-import { mapActions, mapState } from 'pinia';
+import { mapActions, mapState, mapWritableState } from 'pinia';
 import { genreItems, moodItems, tonalityItems } from '../components/filters/filtersItems';
+import { useUserStore } from '../store/userStore';
 
 export default {
   data() {
@@ -209,6 +216,7 @@ export default {
       isValidForm: false,
       trackScreenshot: null,
       isDirty: false,
+      isSaveLoding: false,
       track: {
         id: null,
         name: 'Новый бит',
@@ -263,7 +271,7 @@ export default {
         }
       ],
       audioFiles: {
-        mp3Tag: {
+        mp3tag: {
           fileName: '',
           label: 'Mp3 с войстегом',
           file: null,
@@ -287,8 +295,10 @@ export default {
     }
   },
   computed: {
-    ...mapState(useTrackStore, ['tracks']),
+    ...mapState(useTrackStore, ['tracks',]),
     ...mapState(useLicenseStore, ['licenses']),
+    ...mapState(useUserStore, ['user']),
+    ...mapWritableState(useUserStore, ['isTrackLoading']),
     imgUrl() {
       if (!this.imgFile) return;
 
@@ -332,7 +342,8 @@ export default {
     },
   },
   methods: {
-    ...mapActions(useLicenseStore, ['sortLicensesByType']),
+    ...mapActions(useLicenseStore, ['getAll']),
+    ...mapActions(useTrackStore, ['getOneWithAuth', 'createTrack', 'updateTrack']),
     getText(type) {
       const fileData = this.audioFiles[type].file;
 
@@ -349,34 +360,71 @@ export default {
     findTrackLicense(licenseId) {
       return this.track.trackLicenses.find(tl => tl.licenseId === licenseId);
     },
-    save() {
-      console.log(1);
+    async save() {
+      try {
+        this.isSaveLoding = true;
+        const formData = new FormData();
+        formData.append('name', this.track.name);
+        formData.append('bpm', `${this.track.bpm}`);
+        formData.append('tonality', this.track.tonality);
+        formData.append('genre', this.track.genre);
+        formData.append('mood', this.track.mood);
+        formData.append('description', this.track.description);
+        formData.append('trackLicenses', JSON.stringify(this.track.trackLicenses));
+        formData.append('icon', this.imgFile.length ? this.imgFile[0] : this.imgFile);
+  
+        for (let key in this.audioFiles) {
+          let audioFile = this.audioFiles[key];
+          formData.append(`${key}`, audioFile?.length ? audioFile[0].file : audioFile.file);
+        }
+        
+        console.log(formData)
+        if (this.track.id) {
+          formData.append('id', `${this.track.id}`);
+          await this.updateTrack(formData);
+        } else {
+          await this.createTrack(formData);
+        }
+
+        this.$router.push('/tracksEditor');
+      } catch (e) {
+        alert(e)
+      } finally {
+        this.isSaveLoding = false;
+      }
     }
   },
-  created() {
-    this.sortLicensesByType(this.licenses);
-
-    if (this.isEdit) {
-      this.track = this.tracks[0];
+  async created() {
+    try {
+      this.isTrackLoading = true;
+      await this.getAll(this.user.id);
   
-      if (this.track?.files?.length > 0) {
-        this.track.files.forEach(f => {
-          let splitArray = f.path.split('\\');
-          this.audioFiles[f.type].fileName = splitArray[splitArray.length - 1];
+      if (this.isEdit) {
+        this.track = await this.getOneWithAuth(this.$route.params.id);
+    
+        if (this.track?.files?.length > 0) {
+          this.track.files.forEach(f => {
+            let splitArray = f.path.split('\\');
+            this.audioFiles[f.type].fileName = splitArray[splitArray.length - 1];
+          });
+        }
+  
+        this.audioFiles.mp3tag.fileName = `Tag-${this.audioFiles.mp3.fileName}`;
+      } else {
+        this.track.trackLicenses = this.licenses.map(license => {
+          return {
+            licenseId: license.id,
+            custom_price: license.price,
+          }
         });
       }
-
-      this.audioFiles.mp3Tag.fileName = `Tag-${this.audioFiles.mp3.fileName}`;
-    } else {
-      this.track.trackLicenses = this.licenses.map(license => {
-        return {
-          licenseId: license.id,
-          custom_price: license.price,
-        }
-      });
+  
+      this.trackScreenshot = JSON.stringify(this.track);
+    } catch (e) {
+      alert(e);
+    } finally {
+      this.isTrackLoading = false;
     }
-
-    this.trackScreenshot = JSON.stringify(this.track);
   }
 }
 </script>

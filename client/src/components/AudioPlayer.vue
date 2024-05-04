@@ -120,7 +120,7 @@
             max="100"
             min="0"
             @update:modelValue="setVolume"
-            @click:prepend.stop="muted = !muted"
+            @click:prepend="muted = !muted"
           ></v-slider>
         </v-col>
       </v-row>

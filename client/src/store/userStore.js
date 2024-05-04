@@ -5,15 +5,7 @@ export const useUserStore = defineStore('userStore', {
     return {
       isAuth: false,
       userTab: 'settings',
-      checkingUserProfile: {
-        id: 9,
-        nickname: "admin3",
-        name: 'Андрей',
-        surname: 'Крутой',
-        country: 'Россия',
-        avatar: '',
-        info: 'Я классный)'
-      },
+      checkingUserProfile: {},
       user: {},
     }
   },

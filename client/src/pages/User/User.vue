@@ -56,23 +56,14 @@
   </v-card>
 </template>
 <script>
-import { useTrackStore } from '../../store/trackStore';
 import { useUserStore } from '../../store/userStore';
-import { mapState, mapActions, mapWritableState } from 'pinia';
+import { mapState, mapWritableState } from 'pinia';
 
 export default {
-  data() {
-    return {
-      
-    }
-  },
   computed: {
     ...mapState(useUserStore, ['user']),
     ...mapWritableState(useUserStore, ['userTab']),
   },
-  methods: {
-
-  }
 }
 </script>
 <style lang="scss" scoped>

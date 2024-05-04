@@ -16,7 +16,7 @@
             aspect-ratio="1"
             cover
             alt="Avatar"
-            :src="user.avatar || '/src/assets/noavatar.jpg'"
+            :src="user.avatar && (serverUrl + user.avatar) || '/src/assets/noavatar.jpg'"
           ></v-img>
         </v-avatar>
       </v-btn>
@@ -33,7 +33,7 @@
                 aspect-ratio="1"
                 cover
                 alt="Avatar"
-                :src="user.avatar || '/src/assets/noavatar.jpg'"
+                :src="user.avatar && (serverUrl + user.avatar) || '/src/assets/noavatar.jpg'"
               ></v-img>
             </v-avatar>
           </v-btn>
@@ -75,6 +75,11 @@ import { mapWritableState} from 'pinia'
 import { useUserStore } from '../store/userStore'
 
 export default {
+  data() {
+    return {
+      serverUrl: import.meta.env.VITE_API_URL,
+    }
+  },
   computed: {
     ...mapWritableState(useUserStore, ['user', 'isAuth']),
   },
@@ -83,6 +88,7 @@ export default {
       this.user = {};
       this.isAuth = false;
       localStorage.setItem('token', '');
+      this.$router.push('/login');
     }
   }
 }
