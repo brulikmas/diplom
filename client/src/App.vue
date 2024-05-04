@@ -77,4 +77,9 @@ html {
 .link:hover {
   text-decoration: underline;
 }
+.observer {
+  height: 30px;
+  margin: auto;
+  text-align: center;
+}
 </style>

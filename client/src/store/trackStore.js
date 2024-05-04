@@ -10,6 +10,9 @@ export const useTrackStore = defineStore('trackStore', {
       selectedToCartTrack: null, 
       isTrackLoading: false,
       tracks: [],
+      page: 1,
+      totalItems: 0, 
+      isMoreLoad: false,
     }
   },
   actions: {
@@ -39,12 +42,29 @@ export const useTrackStore = defineStore('trackStore', {
     async getAll(params) {
       try {
         this.isTrackLoading = true;
+        this.page = 1;
 
-        this.tracks = (await getAll(params)).rows;
+        const data = await getAll({...params, page: this.page });
+
+        this.tracks = data.rows;
+        this.totalItems = data.count;
       } catch (e) {
         alert(e.response.data.message);
       } finally {
         this.isTrackLoading = false;
+      }
+    },
+    async loadMoreTracks(params) {
+      try {
+        this.isMoreLoad = true;
+        const data = await getAll({...params, page: this.page });
+
+        this.tracks = [...this.tracks, ...data.rows];
+        this.page += 1;
+      } catch (e) {
+        alert(e)
+      } finally {
+        this.isMoreLoad = false;
       }
     },
     async getOne(trackId) {

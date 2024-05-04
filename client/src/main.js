@@ -8,7 +8,6 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import '@mdi/font/css/materialdesignicons.css'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
-import { useUserStore } from './store/userStore'
 import { jwtDecode } from 'jwt-decode'
 
 //Pinia
@@ -56,6 +55,8 @@ const vuetify = createVuetify({
   }
 });
 
-const pinia = createPinia()
+const pinia = createPinia();
 
-createApp(App).use(vuetify).use(pinia).use(router).mount('#app')
+const app = createApp(App);
+
+app.use(vuetify).use(pinia).use(router).mount('#app')

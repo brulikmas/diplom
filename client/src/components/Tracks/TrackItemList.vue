@@ -117,7 +117,7 @@ export default {
     ...mapActions(useTrackStore, ['openTlDialog']),
     openDialog() {
       if (this.isAuth) {
-        this.openTlDialog(track.id)
+        this.openTlDialog(this.track.id)
       } else {
         this.$router.push('/login');
         return;

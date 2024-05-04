@@ -376,7 +376,15 @@ export default {
   
         for (let key in this.audioFiles) {
           let audioFile = this.audioFiles[key];
-          formData.append(`${key}`, audioFile?.length ? audioFile[0].file : audioFile.file);
+
+          if (audioFile[0]?.file || audioFile?.file) {
+            console.log(audioFile?.length ? audioFile[0]?.file?.name : audioFile?.file?.name)
+            formData.append(
+              `${key}`, 
+              audioFile?.length ? audioFile[0].file : audioFile.file, 
+              encodeURI(audioFile?.length ? audioFile[0]?.file?.name : audioFile?.file?.name)
+            );
+          }
         }
         
         console.log(formData)

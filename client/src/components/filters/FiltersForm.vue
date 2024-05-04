@@ -75,13 +75,11 @@ export default {
       genreItems,
       moodItems,
       tonalityItems,
-      filter: {
-        name: '',
-        bpm: '',
-        genre: '',
-        mood: '',
-        tonality: '',
-      }
+    }
+  },
+  props: {
+    filter: {
+      type: Object,
     }
   },
   methods: {

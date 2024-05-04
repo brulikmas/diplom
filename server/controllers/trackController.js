@@ -61,7 +61,7 @@ class TrackController {
       fs.mkdirSync(dirPath);
 
       files.forEach(v => {
-        console.log(v.file)
+        v.file.name = decodeURI(v.file.name);
         let path = dirPath + `\\${v.file.name}`;
         v.file?.mv(path);
         File.create({ trackId: track.id, type: v.type, path })
@@ -80,7 +80,7 @@ class TrackController {
     try {
       let { userId, name, bpm, tonality, genre, mood, limit, page } = req.query;
       page = page || 1;
-      limit = limit || 9;
+      limit = limit || 12;
       let offset = page * limit - limit;
       let whereConditions = { is_visible: true };
       let tracks;
@@ -260,7 +260,7 @@ class TrackController {
           file: trackout
         }
       ];
-      console.log(req.files)
+
       let iconName = uuid.v4() + '.jpeg';
       let mp3tagName = uuid.v4() + '.mp3';
       icon?.mv(path.resolve(__dirname, '..', 'static', iconName));
@@ -316,7 +316,7 @@ class TrackController {
   
         for (let v of files) {
           if (v.file) {
-            console.log(v)
+            v.file.name = decodeURI(v.file.name);
             let path = dirPath + `\\${v.file.name}`;
             let previosFile = await File.findOne({ where: { trackId: track.id, type: v.type } });
 
