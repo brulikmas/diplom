@@ -75,6 +75,12 @@ const PurchaseItem = sequelize.define('purchase_item', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 });
 
+const MoneyRequest = sequelize.define('money_request', {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  sum: { type: DataTypes.INTEGER, allowNull: false },
+  card_number: { type: DataTypes.STRING, allowNull: false },
+});
+
 User.hasOne(Basket);
 Basket.belongsTo(User);
 
@@ -89,6 +95,9 @@ PurchaseItem.belongsTo(User);
 
 User.hasMany(License);
 License.belongsTo(User);
+
+User.hasMany(MoneyRequest)
+MoneyRequest.belongsTo(User);
 
 Track.hasMany(Rating, { as: 'usersRating' });
 Rating.belongsTo(Track);
@@ -124,5 +133,6 @@ module.exports = {
   License,
   AvailableFile,
   TrackLicense,
-  PurchaseItem
+  PurchaseItem,
+  MoneyRequest,
 }

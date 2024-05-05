@@ -10,5 +10,6 @@ router.put('/', authMiddleware, userController.update);
 router.get('/auth', authMiddleware, userController.check);
 router.get('/:id', userController.getOne);
 router.get('/', checkRole('BEATMAKER'), userController.getBalance);
+router.post('/moneyRequest', checkRole('BEATMAKER'), userController.createMoneyRequest);
 
 module.exports = router;

@@ -33,3 +33,8 @@ export const getBalance = async () => {
   const { data } = await $authHost.get('api/user');
   return data;
 };
+
+export const createMoneyRequest = async (moneyRequest) => {
+  const { data } = await $authHost.post('api/user/moneyRequest', moneyRequest);
+  return data;
+};

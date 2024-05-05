@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const uuid = require('uuid');
 const path = require('path');
-const { User, Basket, License, AvailableFile } = require('../models/models');
+const { User, Basket, License, AvailableFile, MoneyRequest } = require('../models/models');
 const fileTypes = ['mp3', 'wav', 'trackout'];
 const licenses = [
   {
@@ -178,6 +178,32 @@ class UserController {
       return res.json('Информация о пользователе обновлена');
     } catch (e) {
       next(ApiError.badRequest(e.message));
+    }
+  }
+
+  async createMoneyRequest(req, res, next) {
+    try {
+      const { sum, cardNumber } = req.body;
+
+      console.log(sum)
+      console.log(cardNumber)
+
+      const moneyRequest = await MoneyRequest.create({
+        sum,
+        userId: req.user.id,
+        card_number: cardNumber,
+      });
+
+      const user = await User.findOne({ where: { id: req.user.id }});
+
+      User.update(
+        { balance: user.balance - sum },
+        { where: { id: user.id } }
+      )
+
+      return res.json(moneyRequest);
+    } catch (e) {
+      next(ApiError.badRequest(req, res, next));
     }
   }
 }
