@@ -57,10 +57,10 @@ export const useTrackStore = defineStore('trackStore', {
     async loadMoreTracks(params) {
       try {
         this.isMoreLoad = true;
+        this.page += 1;
         const data = await getAll({...params, page: this.page });
 
         this.tracks = [...this.tracks, ...data.rows];
-        this.page += 1;
       } catch (e) {
         alert(e)
       } finally {

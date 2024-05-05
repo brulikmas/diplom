@@ -13,9 +13,9 @@
 
     <nav-drawer :drawer="drawer"></nav-drawer>
 
-      <v-main class="d-flex align-center justify-center" style="min-height: 300px;">
-        <bottom-audio-sheet></bottom-audio-sheet>
+      <v-main @focusin.stop="" class="d-flex align-center justify-center" style="min-height: 300px;">
         <track-licensec-dialog></track-licensec-dialog>
+        <bottom-audio-sheet></bottom-audio-sheet>
         <router-view></router-view>
       </v-main>
   

@@ -4,6 +4,7 @@
       :scrim="false"
       :persistent="true"
       :no-click-animation="true"
+      scroll-strategy="none"
   >
     <audio-player
       :src="serverUrl + currentTrack.mp3tag"

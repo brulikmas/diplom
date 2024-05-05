@@ -6,6 +6,7 @@ export default {
     }
     const callback = (entries, observer) => {
       if (entries[0].isIntersecting && this.tracks.length < this.totalItems) {
+        console.log(this.totalItems)
         const params = this.filter || [];
         this.loadMoreTracks(params);
       }
